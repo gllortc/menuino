@@ -45,7 +45,7 @@ void AddressScreen::Initialize(TouchDisplay lcdDisplay)
 //----------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------
-uint8_t AddressScreen::ClickHandler(uint8_t objId) 
+void AddressScreen::ClickHandler(uint8_t objId, ScrParameters *params) 
 {
   Serial.print("DriveScr object handled: "); Serial.println(objId);
 
@@ -66,22 +66,19 @@ uint8_t AddressScreen::ClickHandler(uint8_t objId)
 
     case UI_ADDR_OK: 
       ToggleButtonState(objId);
-      scrParamTrack   = 0;                    // No track selected (manual selection)
-      scrParamAddress = GetNumericAddress();  // Selected digital address
-      return SCR_DRIVE_ID;
+      params->gotoScr = SCR_DRIVE_ID;
+      params->address = GetNumericAddress();
       break; 
 
     case UI_ADDR_CANCEL: 
       ToggleButtonState(objId);
-      return SCR_MENU_ID;
+      params->gotoScr = SCR_MENU_ID;
       break; 
 
     case UI_ADDR_DEL: 
       DeleteButtonPressed(objId);
       break; 
   }
-
-  return UI_OBJECT_NULL;
 }
 
 //----------------------------------------------
@@ -131,7 +128,7 @@ uint16_t AddressScreen::GetNumericAddress()
 //----------------------------------------------
 // Convert numeric addres into char array
 //----------------------------------------------
-void AddressScreen::GetNumericAddress(uint16_t addr)
+void AddressScreen::SetAddress(uint16_t addr)
 {
   ClearAddress();
   itoa(addr, txtAddress, 10);

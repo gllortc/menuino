@@ -11,10 +11,10 @@
 
 #import  <Arduino.h>
 #include "TouchDisplay.h" 
+#include "ScreenObjects.h" 
 
 #define UI_MAX_OBJECTS          20
 
-#define UI_OBJECT_NULL          99
 #define UI_OBJTYPE_CHECK_BUTTON 1
 #define UI_OBJTYPE_PUSH_BUTTON  2
 #define UI_OBJTYPE_MENU_BUTTON  3
@@ -56,7 +56,7 @@ public:
   const char*   caption;    // Screen caption
 
   // Screen parameters
-  uint8_t       scrParamTrack = 0;
+  uint8_t       scrParamTrack   = 0;
   uint16_t      scrParamAddress = 0;
 
   //----------------------------------------------
@@ -69,9 +69,9 @@ public:
   //----------------------------------------------
   virtual void Initialize(TouchDisplay lcdDisplay, uint8_t scrId, const char* scrCaption);
   virtual void Dispatch(void);
-  virtual void Show(void);
-  virtual void Shown(void);
-  virtual uint8_t ClickHandler(uint8_t objId);
+  virtual void Show(ScrParameters *params);
+  virtual void Shown(ScrParameters *params);
+  virtual void ClickHandler(uint8_t objId, ScrParameters *params);
 
   UIObject* GetUIObject(uint8_t objId);
   uint8_t GetScreenClickedObjectID(int x, int y);

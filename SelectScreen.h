@@ -40,7 +40,7 @@ public:
   //----------------------------------------------
   void Initialize(TouchDisplay lcdDisplay);
   void Dispatch(void);
-  uint8_t ClickHandler(uint8_t objId) override;
+  void ClickHandler(uint8_t objId, ScrParameters *returnParams) override;
   
 };
 

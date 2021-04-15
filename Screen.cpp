@@ -29,10 +29,9 @@ void Screen::Dispatch(void)
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-uint8_t Screen::ClickHandler(uint8_t objId) 
+void Screen::ClickHandler(uint8_t objId, ScrParameters *params) 
 { 
-  Serial.println("ERR: Handling click in base class!");
-  return UI_OBJECT_NULL; 
+  Serial.println("WARN: Handling click in base class!");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -40,7 +39,7 @@ uint8_t Screen::ClickHandler(uint8_t objId)
 //----------------------------------------------------------------------------------------------------
 UIObject* Screen::GetUIObject(uint8_t objId)
 {
-   return &uiObjects[objId];
+  return &uiObjects[objId];
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -49,29 +48,29 @@ UIObject* Screen::GetUIObject(uint8_t objId)
 //----------------------------------------------------------------------------------------------------
 uint8_t Screen::GetScreenClickedObjectID(int x, int y)
 {
-   for (int i = 0; i < UI_MAX_OBJECTS; i++)
-   {
-      if (uiObjects[i].initialized)
+  for (int i = 0; i < UI_MAX_OBJECTS; i++)
+  {
+    if (uiObjects[i].initialized)
+    {
+      if (x >= uiObjects[i].x && x <= (uiObjects[i].x + uiObjects[i].width))
       {
-         if (x >= uiObjects[i].x && x <= (uiObjects[i].x + uiObjects[i].width))
-         {
-            Serial.println("X matches");
-            if (y >= uiObjects[i].y && y <= (uiObjects[i].y + uiObjects[i].height))
-            {
-               Serial.println("Y matches");
-               return i;
-            }
-         }
+        Serial.println("X matches");
+        if (y >= uiObjects[i].y && y <= (uiObjects[i].y + uiObjects[i].height))
+        {
+          Serial.println("Y matches");
+          return i;
+        }
       }
-   }
+    }
+  }
    
-   return UI_OBJECT_NULL;
+  return UI_OBJECT_NULL;
 }
 
 //----------------------------------------------------------------------------------------------------
 // Paint the screen with its current UI objects states
 //----------------------------------------------------------------------------------------------------
-void Screen::Show(void)
+void Screen::Show(ScrParameters *params)
 {
   Serial.println("Showing screen...");
 
@@ -96,7 +95,7 @@ void Screen::Show(void)
     }
   }
 
-  Shown();
+  Shown(params);
 
   Serial.println("Screen shown!");
 }
@@ -105,20 +104,20 @@ void Screen::Show(void)
 // Virtual method that can be implemented by derived classes 
 // to show information when the screen is shown
 //----------------------------------------------------------------------------------------------------
-void Screen::Shown(void) {}
+void Screen::Shown(ScrParameters *params) {}
 
 //----------------------------------------------------------------------------------------------------
 // Change the screen caption
 //----------------------------------------------------------------------------------------------------
 void Screen::SetScreenCaption(const char* newCaption)
 {
-   caption = newCaption;
-   
-   disp.tft.fillRect(0, 21, 180, 50, COLOR_SCR_CAPTION_BACKGROUND);  
-   disp.tft.setTextColor(COLOR_SCR_TEXT);
-   disp.tft.setTextSize(3);                 
-   disp.tft.setCursor(18, 36);
-   disp.tft.print(caption);
+  caption = newCaption;
+
+  disp.tft.fillRect(39, 21, 180, 50, COLOR_SCR_CAPTION_BACKGROUND);
+  disp.tft.setTextColor(COLOR_SCR_TEXT);
+  disp.tft.setTextSize(2);
+  disp.tft.setCursor(40, 40);
+  disp.tft.print(caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -126,19 +125,19 @@ void Screen::SetScreenCaption(const char* newCaption)
 //----------------------------------------------------------------------------------------------------
 void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption)
 {
-   if (!uiObjects[id].initialized)
-   {
-      uiObjects[id].initialized    = true;
-      uiObjects[id].type           = UI_OBJTYPE_PUSH_BUTTON;
-      uiObjects[id].x              = x;
-      uiObjects[id].y              = y;
-      uiObjects[id].width          = width;
-      uiObjects[id].height         = height;
-      uiObjects[id].pressed        = false;
-      uiObjects[id].colorPressed   = colPress;
-      uiObjects[id].colorUnpressed = colNorm;
-      uiObjects[id].caption        = caption;
-   }
+  if (!uiObjects[id].initialized)
+  {
+    uiObjects[id].initialized    = true;
+    uiObjects[id].type           = UI_OBJTYPE_PUSH_BUTTON;
+    uiObjects[id].x              = x;
+    uiObjects[id].y              = y;
+    uiObjects[id].width          = width;
+    uiObjects[id].height         = height;
+    uiObjects[id].pressed        = false;
+    uiObjects[id].colorPressed   = colPress;
+    uiObjects[id].colorUnpressed = colNorm;
+    uiObjects[id].caption        = caption;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -146,21 +145,21 @@ void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, u
 //----------------------------------------------------------------------------------------------------
 void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap)
 {
-   if (!uiObjects[id].initialized)
-   {
-      uiObjects[id].initialized    = true;
-      uiObjects[id].type           = UI_OBJTYPE_PUSH_BUTTON;
-      uiObjects[id].x              = x;
-      uiObjects[id].y              = y;
-      uiObjects[id].width          = width;
-      uiObjects[id].height         = height;
-      uiObjects[id].pressed        = false;
-      uiObjects[id].colorPressed   = colPress;
-      uiObjects[id].colorUnpressed = colNorm;
-      uiObjects[id].bmpWidth       = bmpWidth;
-      uiObjects[id].bmpHeight      = bmpHeight;
-      uiObjects[id].bitmap         = bitmap;
-   }
+  if (!uiObjects[id].initialized)
+  {
+    uiObjects[id].initialized    = true;
+    uiObjects[id].type           = UI_OBJTYPE_PUSH_BUTTON;
+    uiObjects[id].x              = x;
+    uiObjects[id].y              = y;
+    uiObjects[id].width          = width;
+    uiObjects[id].height         = height;
+    uiObjects[id].pressed        = false;
+    uiObjects[id].colorPressed   = colPress;
+    uiObjects[id].colorUnpressed = colNorm;
+    uiObjects[id].bmpWidth       = bmpWidth;
+    uiObjects[id].bmpHeight      = bmpHeight;
+    uiObjects[id].bitmap         = bitmap;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -168,19 +167,19 @@ void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, u
 //----------------------------------------------------------------------------------------------------
 void Screen::AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, bool pressed)
 {
-   if (!uiObjects[id].initialized)
-   {
-      uiObjects[id].initialized    = true;
-      uiObjects[id].type           = UI_OBJTYPE_CHECK_BUTTON;
-      uiObjects[id].x              = x;
-      uiObjects[id].y              = y;
-      uiObjects[id].width          = width;
-      uiObjects[id].height         = height;
-      uiObjects[id].pressed        = pressed;
-      uiObjects[id].colorPressed   = colPress;
-      uiObjects[id].colorUnpressed = colNorm;
-      uiObjects[id].caption        = caption;
-   }
+  if (!uiObjects[id].initialized)
+  {
+    uiObjects[id].initialized    = true;
+    uiObjects[id].type           = UI_OBJTYPE_CHECK_BUTTON;
+    uiObjects[id].x              = x;
+    uiObjects[id].y              = y;
+    uiObjects[id].width          = width;
+    uiObjects[id].height         = height;
+    uiObjects[id].pressed        = pressed;
+    uiObjects[id].colorPressed   = colPress;
+    uiObjects[id].colorUnpressed = colNorm;
+    uiObjects[id].caption        = caption;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

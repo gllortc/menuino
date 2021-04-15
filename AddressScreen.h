@@ -45,15 +45,14 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(TouchDisplay lcdDisplay);
-  // void Dispatch(void);
-  uint8_t ClickHandler(uint8_t objId) override;
+  void ClickHandler(uint8_t objId, ScrParameters *params) override;
 
 private:
 
   void DigitPressed(uint8_t objId);
   void DeleteButtonPressed(uint8_t objId);
   uint16_t GetNumericAddress();
-  void GetNumericAddress(uint16_t addr);
+  void SetAddress(uint16_t addr);
   void ClearAddress();
   
 };

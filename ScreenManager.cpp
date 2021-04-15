@@ -29,9 +29,8 @@ void ScreenManager::Initialize()
   scrAddress = new AddressScreen();
   scrAddress->Initialize(scr);
 
-  // Show 1st screen
-  scrCurrent = scrMenu;
-  scrCurrent->Show();
+  // Show initial screen
+  ShowScreen(SCR_MENU_ID);
 }
 
 //----------------------------------------------
@@ -54,13 +53,15 @@ void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
   Serial.print("Object clicked: ");
   Serial.println(objId);
 
-  uint8_t newScr = scrCurrent->ClickHandler(objId);
-  if (newScr == UI_OBJECT_NULL) return;
+  ScrParameters params;
+
+  scrCurrent->ClickHandler(objId, &params);
+  if (params.gotoScr == UI_OBJECT_NULL) return;
 
   Serial.print("Moving to screen: ");
-  Serial.println(newScr);
+  Serial.println(params.gotoScr);
 
-  ShowScreen(newScr);
+  ShowScreen(params);
 }
 
 //----------------------------------------------
@@ -74,36 +75,43 @@ Screen* ScreenManager::GetCurrentScreen(void)
 //----------------------------------------------
 // Set new current screen
 //----------------------------------------------
-void ScreenManager::ShowScreen(uint8_t scrId)
+void ScreenManager::ShowScreen(uint8_t gotoScr)
 {
-  switch (scrId)
+  ScrParameters params;
+  params.gotoScr = gotoScr;
+  ShowScreen(params);
+}
+
+//----------------------------------------------
+// Set new current screen
+//----------------------------------------------
+void ScreenManager::ShowScreen(ScrParameters params)
+{
+  switch (params.gotoScr)
   {
     case SCR_MENU_ID:
       scrCurrent = scrMenu;
-      scrCurrent->Show();
+      scrCurrent->Show(&params);
       break;
 
     case SCR_SELECT_ID:
       scrCurrent = scrSelect;
-      scrCurrent->Show();
+      scrCurrent->Show(&params);
       break;
 
     case SCR_DRIVE_ID:
       scrCurrent = scrDrive;
-      scrCurrent->Show();
+      scrCurrent->Show(&params);
       break;
 
     case SCR_ADDRESS_ID:
       scrCurrent = scrAddress;
-      scrCurrent->Show();
+      scrCurrent->Show(&params);
       break;
 
     case SCR_MESSAGE_ID:
       scrCurrent = srcMessage;
-      scrCurrent->Show();
-      break;
-
-    default:
+      scrCurrent->Show(&params);
       break;
   }
 }

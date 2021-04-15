@@ -1,12 +1,15 @@
 #ifndef _SCREENOBJECTS_H 
 #define _SCREENOBJECTS_H 
 
+// UI null object ID (used for objects and screens)
+#define UI_OBJECT_NULL  99
+
 // Screen IDs
-#define SCR_MENU_ID    1
-#define SCR_SELECT_ID  2
-#define SCR_DRIVE_ID   3
-#define SCR_ADDRESS_ID 4
-#define SCR_MESSAGE_ID 5
+#define SCR_MENU_ID     1
+#define SCR_SELECT_ID   2
+#define SCR_DRIVE_ID    3
+#define SCR_ADDRESS_ID  4
+#define SCR_MESSAGE_ID  5
 
 //---------------------------------------------------------
 // Icons used outside the classes
@@ -151,5 +154,13 @@ const uint8_t BMP_STOP[] = {
 
 #define COLOR_TXT_BACKGROUND            0x39C7
 #define COLOR_TXT_BORDER                0xF7BE
+
+// Screen returning parameters
+typedef struct 
+{
+  int      gotoScr  = UI_OBJECT_NULL; // MANDATORY
+  int      trackNum = 0;              // app defined
+  uint16_t address  = 0;              // app defined
+} ScrParameters;
 
 #endif

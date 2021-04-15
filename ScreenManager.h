@@ -40,7 +40,8 @@ public:
   //----------------------------------------------
   void Initialize(void);
   void Dispatch(void);
-  void ShowScreen(uint8_t scrId);
+  void ShowScreen(uint8_t gotoScr);
+  void ShowScreen(ScrParameters params);
   void HandleScreenClick(uint16_t xpos, uint16_t ypos);
   Screen* GetCurrentScreen(void);
   

@@ -15,7 +15,7 @@ void DriveScreen::Initialize(TouchDisplay lcdDisplay)
 {
   disp    = lcdDisplay;
   id      = SCR_DRIVE_ID;
-  caption = "E103 - Track 1";
+  caption = "";
 
   encoder_begin(ENCODER_PIN_1, ENCODER_PIN_2);
 
@@ -49,10 +49,23 @@ void DriveScreen::Initialize(TouchDisplay lcdDisplay)
 // Virtual method that can be implemented by derived classes 
 // to show information when the screen is shown
 //----------------------------------------------------------------------------------------------------
-void DriveScreen::Shown(void) 
+void DriveScreen::Shown(ScrParameters *params) 
 {
-  disp.tft.setCursor(20, 90);
-  disp.tft.print(scrParamAddress);
+  if (params->trackNum > 0)
+  {
+    char buff[8] = "TRACK ";
+    buff[6] = '0' + params->trackNum;
+    SetScreenCaption(buff);
+  }
+  else
+    SetScreenCaption("MANUAL DRIVE");
+  
+  disp.tft.setCursor(18, 85);
+  disp.tft.setTextSize(1);
+  disp.tft.print("ADDRESS");
+  disp.tft.setTextSize(3);
+  disp.tft.setCursor(18, 100);
+  disp.tft.print(params->address);
 }
 
 //----------------------------------------------
@@ -66,7 +79,7 @@ void DriveScreen::Dispatch()
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-uint8_t DriveScreen::ClickHandler(uint8_t objId) 
+void DriveScreen::ClickHandler(uint8_t objId, ScrParameters *params) 
 {
   Serial.print("DriveScr object handled: "); Serial.println(objId);
 
@@ -74,7 +87,7 @@ uint8_t DriveScreen::ClickHandler(uint8_t objId)
   {
     case UI_CTRL_RETURN:
       ToggleButtonState(objId);
-      return SCR_MENU_ID;
+      params->gotoScr = SCR_MENU_ID;
       break; 
       
     case UI_CTRL_F0: 
@@ -107,6 +120,4 @@ uint8_t DriveScreen::ClickHandler(uint8_t objId)
     case UI_CTRL_SPEED_DWN_BIG: 
       break;
   }
-
-  return UI_OBJECT_NULL;
 }
