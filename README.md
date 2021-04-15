@@ -1,6 +1,6 @@
 # MENUINO UI
 
-![Sample screen](https://github.com/gllortc/menuino/blob/master/docs/1618504383395.jpg)
+![Sample screen](https://github.com/gllortc/menuino/blob/master/docs/1618504383401.jpg)
 
 ## UI system for Arduino and touchscreens
 
