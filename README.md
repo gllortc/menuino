@@ -1,4 +1,7 @@
 # MENUINO UI
+
+![Sample screen](https://github.com/gllortc/menuino/blob/master/docs/1618504383401.jpg)
+
 ## UI system for Arduino and touchscreens
 
 This project is a simple way to create a complete UI system for TDT/LCD touchscreens for the Arduino microcontrollers (and other supported platforms). Actually the systems supports de following UI elements for the screens:
