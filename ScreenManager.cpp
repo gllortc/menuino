@@ -65,6 +65,28 @@ void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
 }
 
 //----------------------------------------------
+// Handle engine notification received
+//----------------------------------------------
+void ScreenManager::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, boolean busy, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean req)
+{
+  // Discard notifications outside the drive screen
+  if (scrCurrent->id != SCR_DRIVE_ID) return;
+
+  ((DriveScreen*)scrCurrent)->HandleEngineNotify(adrHigh, adrLow, busy, steps, speed, dir, F0, F1, F2, F3, req);
+}
+
+//----------------------------------------------
+// Handle central status notifications
+//----------------------------------------------
+void ScreenManager::HandleMasterStatusNotify(uint8_t status)
+{
+  // Discard notifications outside the drive screen
+  if (scrCurrent->id != SCR_DRIVE_ID) return;
+
+  ((DriveScreen*)scrCurrent)->HandleMasterStatusNotify(status);
+}
+
+//----------------------------------------------
 // Gets the current screen instance
 //----------------------------------------------
 Screen* ScreenManager::GetCurrentScreen(void)

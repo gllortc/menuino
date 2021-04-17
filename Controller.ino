@@ -31,7 +31,7 @@ void loop()
 }
 
 //----------------------------------------------
-// Callback for screen touch
+// Touchscreen callback
 //----------------------------------------------
 void OnClick(uint16_t xpos, uint16_t ypos) 
 {
@@ -40,6 +40,22 @@ void OnClick(uint16_t xpos, uint16_t ypos)
   Serial.print("y:"); Serial.println(ypos);
 
   manager.HandleScreenClick(xpos, ypos);
+}
+
+//------------------------------------------------------
+// XPN Callback: XPN power notification
+//------------------------------------------------------
+void notifyXNetPower(uint8_t State) 
+{
+  manager.HandleMasterStatusNotify(State);
+}
+
+//------------------------------------------------------
+// XPN Callback: Locomotive status notification
+//------------------------------------------------------
+void notifyLokAll(uint8_t Adr_High, uint8_t Adr_Low, boolean Busy, uint8_t Steps, uint8_t Speed, uint8_t Direction, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean Req) 
+{
+  manager.HandleEngineNotify(Adr_High, Adr_Low, Busy, Steps, Speed, Direction, F0, F1, F2, F3, Req);
 }
 
 
