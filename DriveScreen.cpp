@@ -1,4 +1,5 @@
-#import <Arduino.h>
+#import  <Arduino.h>
+#include <EEPROM.h>
 #include "DriveScreen.h"
 #include "ScreenObjects.h"
 #include <Encoder_Polling.h>
@@ -19,30 +20,32 @@ void DriveScreen::Initialize(TouchDisplay lcdDisplay)
 
   encoder_begin(ENCODER_PIN_1, ENCODER_PIN_2);
 
-  AddPushButton(UI_CTRL_RETURN, 180, 85, 42, 42, COLOR_BTN_INFO_NORMAL, COLOR_BTN_INFO_PRESSED, 24, 24, BMP_RETURN);
+  AddPushButton(UI_CTRL_RETURN,         180, 85, 42, 42,  COLOR_BTN_INFO_NORMAL,  COLOR_BTN_INFO_PRESSED,   24, 24, BMP_RETURN);
 
-  AddStateButton(UI_CTRL_F0, 18,  135, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, 24, 24, BMP_LIGHT, false);
-  AddStateButton(UI_CTRL_F1, 72,  135, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, "F1", false);
-  AddStateButton(UI_CTRL_F2, 126, 135, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, "F2", false);
-  AddStateButton(UI_CTRL_F3, 180, 135, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, "F3", false);
+  AddStateButton(UI_CTRL_F0,            18,  135, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, 24, 24, BMP_LIGHT, false);
+  AddStateButton(UI_CTRL_F1,            72,  135, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, "F1", false);
+  AddStateButton(UI_CTRL_F2,            126, 135, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, "F2", false);
+  AddStateButton(UI_CTRL_F3,            180, 135, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, "F3", false);
    
-  AddStateButton(UI_CTRL_F4, 18,  185, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, "F4", false);
-  AddStateButton(UI_CTRL_F5, 72,  185, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, "F5", false);
-  AddStateButton(UI_CTRL_F6, 126, 185, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, "F6", false);
-  AddStateButton(UI_CTRL_F7, 180, 185, 42, 42, COLOR_BTN_NORMAL, COLOR_BTN_WARNING_NORMAL, "F7", false);
+  AddStateButton(UI_CTRL_F4,            18,  185, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, "F4", false);
+  AddStateButton(UI_CTRL_F5,            72,  185, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, "F5", false);
+  AddStateButton(UI_CTRL_F6,            126, 185, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, "F6", false);
+  AddStateButton(UI_CTRL_F7,            180, 185, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_WARNING_NORMAL, "F7", false);
    
   // Speed controller
-  AddPushButton(UI_CTRL_SPEED_DWN_BIG, 18,  235, 42, 60, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, 24, 24, BMP_FAST_BACKWARD);
-  AddPushButton(UI_CTRL_SPEED_DWN,     72,  235, 42, 60, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, 24, 24, BMP_BACK);
-  AddPushButton(UI_CTRL_SPEED_UP,      126, 235, 42, 60, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, 24, 24, BMP_FORWARD);
-  AddPushButton(UI_CTRL_SPEED_UP_BIG,  180, 235, 42, 60, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, 24, 24, BMP_FAST_FORWARD);
+  AddPushButton(UI_CTRL_SPEED_DWN_BIG,  18,  235, 42, 60, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,        24, 24, BMP_FAST_BACKWARD);
+  AddPushButton(UI_CTRL_SPEED_DWN,      72,  235, 42, 60, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,        24, 24, BMP_BACK);
+  AddPushButton(UI_CTRL_SPEED_UP,       126, 235, 42, 60, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,        24, 24, BMP_FORWARD);
+  AddPushButton(UI_CTRL_SPEED_UP_BIG,   180, 235, 42, 60, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,        24, 24, BMP_FAST_FORWARD);
    
-  AddStateButton(UI_CTRL_DIR_FWD, 18,  303, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,       24, 24, BMP_DIR_BACK,    true);
-  AddStateButton(UI_CTRL_STOP,    72,  303, 92, 42, COLOR_BTN_ERROR_NORMAL, COLOR_BTN_ERROR_PRESSED, 24, 24, BMP_STOP,        false);
-  AddStateButton(UI_CTRL_DIR_REV, 180, 303, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,       24, 24, BMP_DIR_FORWARD, false);
+  AddStateButton(UI_CTRL_DIR_FWD,       18,  303, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,        24, 24, BMP_DIR_BACK,    true);
+  AddStateButton(UI_CTRL_STOP,          72,  303, 92, 42, COLOR_BTN_ERROR_NORMAL, COLOR_BTN_ERROR_PRESSED,  24, 24, BMP_STOP,        false);
+  AddStateButton(UI_CTRL_DIR_REV,       180, 303, 42, 42, COLOR_BTN_NORMAL,       COLOR_BTN_PRESSED,        24, 24, BMP_DIR_FORWARD, false);
    
   // Progress bar
-  AddProgressBar(UI_CTRL_PGBAR, 18, 355, 204, 20, 0x3186, 0x02B3, 0x1AAE, 0); // activeEngine.speed);
+  AddProgressBar(UI_CTRL_PGBAR,         18, 355, 204, 20, COLOR_PGB_BACKGROUND,   COLOR_PGB_BORDER,         COLOR_PGB_FILL, 0); // activeEngine.speed);
+
+  GetXPNDeviceID();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -59,13 +62,21 @@ void DriveScreen::Shown(ScrParameters *params)
   }
   else
     SetScreenCaption("MANUAL DRIVE");
+
+  disp.tft.setTextSize(1);
+
+  char id[2];
+  disp.tft.setCursor(4, 8);
+  disp.tft.print("Device #");
+  disp.tft.print(itoa(xpnDeviceID, id, 10));
   
   disp.tft.setCursor(18, 85);
-  disp.tft.setTextSize(1);
   disp.tft.print("ADDRESS");
   disp.tft.setTextSize(3);
   disp.tft.setCursor(18, 100);
   disp.tft.print(params->address);
+
+  
 
   // Start XPN communications
   xpn.start(xpnDeviceID, XPN_TXRX_PIN); // Start XPN
@@ -77,7 +88,7 @@ void DriveScreen::Shown(ScrParameters *params)
 //----------------------------------------------
 void DriveScreen::Dispatch()
 {
-  // TODO -> XpressNet library stuff
+  xpn.receive();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -233,7 +244,14 @@ void DriveScreen::ToggleEngineFunction(uint8_t funcNum)
   }
 }
 
-void DriveScreen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, boolean busy, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean req)
+uint8_t DriveScreen::GetXPNDeviceID()
+{
+  xpnDeviceID = EEPROM.read(0);
+  if (xpnDeviceID <= 0 || xpnDeviceID > 31) xpnDeviceID = 25;
+  return xpnDeviceID;
+}
+
+void DriveScreen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)
 {
   // Check if engine address is the controlled engine
   uint16_t engineAdr = ((adrHigh << 8) & 0x3F) + adrLow;

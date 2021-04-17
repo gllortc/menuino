@@ -29,11 +29,11 @@ void TouchDisplay::Initialize()
    
    DrawBaseScreen("TRAIN CONTROL");
 
-   PrintTextLine("Running MENUINO OS version 1.1");
+   PrintTextLine("Running MENUINO UI version 1.1");
    delay(1500);
-   PrintTextLine("> Loading...");
+   PrintTextLine("> Starting LCD manager");
    delay(200);
-   PrintTextLine("> Starting TouchScreen manager...");
+   PrintTextLine("> Ready");
    delay(200);
    
    // Touchscreen initialization
@@ -47,6 +47,9 @@ void TouchDisplay::Initialize()
    ts = TouchScreen(XP, YP, XM, YM, 260);     // call the constructor AGAIN with new values.
 }
 
+//----------------------------------------------
+// Touschscreen dispatcher
+//----------------------------------------------
 void TouchDisplay::Dispatch()
 {
    uint8_t  idx = -1;
@@ -80,16 +83,17 @@ void TouchDisplay::Dispatch()
       OnClick(xpos, ypos);
 }
 
-//----------------------------------------------------------------------------------------------------
+//----------------------------------------------
 // Paint a blank screen with caption
-//----------------------------------------------------------------------------------------------------
-void TouchDisplay::DrawBaseScreen(const char* caption = "")
+//----------------------------------------------
+void TouchDisplay::DrawBaseScreen(const char* caption)
 {
   tft.fillScreen(COLOR_SCR_BACKGROUND);
-  tft.fillRect(0, 0,  240, 20, COLOR_SCR_NOTIFYBAR_BACKGROUND);
+  tft.fillRect(0, 0,  240, 20, COLOR_NAVBAR_BACKGROUND);
   tft.fillRect(0, 21, 240, 50, COLOR_SCR_CAPTION_BACKGROUND);  
 
-  tft.drawBitmap(10, 35, BMP_MENU, 24, 24, 0xFFFFFF);
+  tft.drawBitmap(220, 2, BMP_XPN_OFF, 18, 18, COLOR_NAVBAR_DISABLED);
+  tft.drawBitmap(10, 35, BMP_MENU,    24, 24, 0xFFFF);
    
   tft.setTextColor(COLOR_SCR_TEXT);
   tft.setTextSize(2);                 
@@ -101,12 +105,18 @@ void TouchDisplay::DrawBaseScreen(const char* caption = "")
   tft.setCursor(1, 85);
 }
 
+//----------------------------------------------
+// Print a text line in the screen
+//----------------------------------------------
 void TouchDisplay::PrintTextLine(const char *text)
 {
   tft.setTextColor(COLOR_SCR_TEXT);
   tft.println(text);
 }
 
+//----------------------------------------------
+// Print an error text line in the screen
+//----------------------------------------------
 void TouchDisplay::PrintErrTextLine(const char *text)
 {
    tft.setTextColor(COLOR_SCR_ERROR_TEXT);

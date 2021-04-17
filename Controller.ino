@@ -45,17 +45,26 @@ void OnClick(uint16_t xpos, uint16_t ypos)
 //------------------------------------------------------
 // XPN Callback: XPN power notification
 //------------------------------------------------------
-void notifyXNetPower(uint8_t State) 
+void notifyXNetPower(uint8_t state) 
 {
-  manager.HandleMasterStatusNotify(State);
+  manager.HandleMasterStatusNotify(state);
 }
 
 //------------------------------------------------------
 // XPN Callback: Locomotive status notification
 //------------------------------------------------------
-void notifyLokAll(uint8_t Adr_High, uint8_t Adr_Low, boolean Busy, uint8_t Steps, uint8_t Speed, uint8_t Direction, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean Req) 
+void notifyLokAll(uint8_t adrHigh, uint8_t adrLow, boolean busy, uint8_t steps, uint8_t speed, uint8_t direction, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean req) 
 {
-  manager.HandleEngineNotify(Adr_High, Adr_Low, Busy, Steps, Speed, Direction, F0, F1, F2, F3, Req);
+  manager.HandleEngineNotify(adrHigh, adrLow, steps, speed, direction, F0, F1, F2, F3);
+}
+
+//------------------------------------------------------
+// XPN Callback: network status notification
+//------------------------------------------------------
+void notifyXNetStatus(uint8_t state) 
+{
+  // TODO: should be a separate LED in the controller
+  digitalWrite(LED_BUILTIN, state); 
 }
 
 

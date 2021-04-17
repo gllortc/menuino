@@ -57,11 +57,9 @@ public:
   //----------------------------------------------
   void Initialize();
   void Dispatch(void);
-  void DrawBaseScreen(const char* caption = "");
+  void DrawBaseScreen(const char* caption);
   void PrintTextLine(const char *text);
-  // void PrintTextLine(const String &text);
   void PrintErrTextLine(const char *text);
-  // void PrintErrTextLine(const String &text);
 };
 
 //----------------------------------------------

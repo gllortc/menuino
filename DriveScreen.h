@@ -46,6 +46,21 @@
 #define UI_CTRL_PGBAR         16
 
 //----------------------------------------------
+// EEPROM storage
+//----------------------------------------------
+// byte  |  description
+//--------------------------
+//  0    |  Device ID
+//  1    |  Track 1 addr low byte
+//  2    |  Track 1 addr high byte
+//  3    |  Track 2 addr low byte
+//  4    |  Track 2 addr high byte
+//  5    |  Track 3 addr low byte
+//  6    |  Track 3 addr high byte
+//  7    |  Track 4 addr low byte
+//  8    |  Track 4 addr high byte
+
+//----------------------------------------------
 // Struct storing engine info
 //----------------------------------------------
 
@@ -89,7 +104,7 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(TouchDisplay lcdDisplay);
-  void Dispatch(void);
+  void Dispatch();
   void Shown(ScrParameters *params) ;
   void ClickHandler(uint8_t objId, ScrParameters *params) override;
 
@@ -101,8 +116,9 @@ public:
   void GetEngineFuncs();
   void SetEngineSpeed(uint8_t speed);
   void ToggleEngineFunction(uint8_t funcNum);
+  uint8_t GetXPNDeviceID();
 
-  void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, boolean busy, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean req);
+  void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
   void HandleMasterStatusNotify(uint8_t status);
   
 };
