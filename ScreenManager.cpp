@@ -29,6 +29,9 @@ void ScreenManager::Initialize()
   scrAddress = new AddressScreen();
   scrAddress->Initialize(scr);
 
+  scrSetup = new SetupScreen();
+  scrSetup->Initialize(scr);
+
   // Show initial screen
   ShowScreen(SCR_MENU_ID);
 }
@@ -132,7 +135,12 @@ void ScreenManager::ShowScreen(ScrParameters params)
       break;
 
     case SCR_MESSAGE_ID:
-      scrCurrent = srcMessage;
+      scrCurrent = scrMessage;
+      scrCurrent->Show(&params);
+      break;
+
+    case SCR_SETUP_ID:
+      scrCurrent = scrSetup;
       scrCurrent->Show(&params);
       break;
   }

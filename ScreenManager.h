@@ -16,6 +16,7 @@
 #include "DriveScreen.h" 
 #include "AddressScreen.h" 
 #include "MsgScreen.h" 
+#include "SetupScreen.h" 
 
 class ScreenManager 
 {
@@ -26,7 +27,8 @@ class ScreenManager
   SelectScreen*  scrSelect;
   DriveScreen*   scrDrive;
   AddressScreen* scrAddress;
-  MsgScreen*     srcMessage;
+  MsgScreen*     scrMessage;
+  SetupScreen*   scrSetup;
 
 public:
 

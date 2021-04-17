@@ -44,9 +44,4 @@ public:
   
 };
 
-//----------------------------------------------
-// Callbacks
-//----------------------------------------------
-extern void ClickedElement(uint8_t id) __attribute__ ((weak));
-
 #endif

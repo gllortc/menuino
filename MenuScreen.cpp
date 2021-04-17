@@ -74,7 +74,7 @@ void MenuScreen::ClickHandler(uint8_t objId, ScrParameters *returnParams)
 
     case UI_MENU_SETUP:
       ToggleButtonState(objId);
-      returnParams->gotoScr = SCR_MESSAGE_ID;
+      returnParams->gotoScr = SCR_SETUP_ID;
       break;
   }
 }

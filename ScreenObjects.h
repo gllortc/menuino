@@ -10,6 +10,7 @@
 #define SCR_DRIVE_ID    3
 #define SCR_ADDRESS_ID  4
 #define SCR_MESSAGE_ID  5
+#define SCR_SETUP_ID    6
 
 //---------------------------------------------------------
 // Icons used outside the classes
