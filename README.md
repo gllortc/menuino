@@ -14,7 +14,7 @@ This project is a simple way to create a complete UI system for TDT/LCD touchscr
 
 ## Creating screens
 
-Each screen is an extended class of the `Screen` class.
+Each screen is a derived class of the `Screen` base class.
 
 ## Supported screens
 
