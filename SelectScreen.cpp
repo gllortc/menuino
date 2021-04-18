@@ -56,41 +56,31 @@ void SelectScreen::Dispatch()
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-void SelectScreen::ClickHandler(uint8_t objId, ScrParameters *returnParams) 
+ScrParameters* SelectScreen::ClickHandler(uint8_t objId)
 {
   switch (objId)
   {
     case UI_SELECT_TRACK1: 
       ToggleButtonState(objId);
-      returnParams->gotoScr  = SCR_DRIVE_ID;
-      returnParams->trackNum = 1;
-      returnParams->address  = 163;
-      break;
+      return GotoScreen(SCR_DRIVE_ID, 163, 1);
       
     case UI_SELECT_TRACK2: 
       ToggleButtonState(objId);
-      returnParams->gotoScr  = SCR_DRIVE_ID;
-      returnParams->trackNum = 2;
-      returnParams->address  = 163;
-      break;
+      return GotoScreen(SCR_DRIVE_ID, 163, 2);
       
     case UI_SELECT_TRACK3: 
       ToggleButtonState(objId);
-      returnParams->gotoScr  = SCR_DRIVE_ID;
-      returnParams->trackNum = 3;
-      returnParams->address  = 163;
-      break;
+      return GotoScreen(SCR_DRIVE_ID, 163, 3);
       
     case UI_SELECT_TRACK4: 
       ToggleButtonState(objId);
-      returnParams->gotoScr  = SCR_DRIVE_ID;
-      returnParams->trackNum = 4;
-      returnParams->address  = 163;
-      break;
+      return GotoScreen(SCR_DRIVE_ID, 163, 4);
       
     case UI_SELECT_RETURN: 
       ToggleButtonState(objId);
-      returnParams->gotoScr = SCR_MENU_ID;
-      break;
+      return GotoScreen(SCR_MENU_ID);
+
+    default:
+      return NULL;
   }
 }

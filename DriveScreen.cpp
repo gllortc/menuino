@@ -94,16 +94,13 @@ void DriveScreen::Dispatch()
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-void DriveScreen::ClickHandler(uint8_t objId, ScrParameters *params) 
+ScrParameters* DriveScreen::ClickHandler(uint8_t objId)
 {
-  Serial.print("DriveScr object handled: "); Serial.println(objId);
-
   switch (objId)
   {
     case UI_CTRL_RETURN:
       ToggleButtonState(objId);
-      params->gotoScr = SCR_MENU_ID;
-      break; 
+      return GotoScreen(SCR_MENU_ID);
       
     case UI_CTRL_F0: 
     case UI_CTRL_F1: 
@@ -113,7 +110,6 @@ void DriveScreen::ClickHandler(uint8_t objId, ScrParameters *params)
     case UI_CTRL_F5: 
     case UI_CTRL_F6: 
     case UI_CTRL_F7: 
-      Serial.print("Function button clicked. ID="); Serial.println(objId);
       ToggleButtonState(objId);
       break;
 
@@ -138,6 +134,9 @@ void DriveScreen::ClickHandler(uint8_t objId, ScrParameters *params)
       
     case UI_CTRL_SPEED_DWN_BIG: 
       break;
+
+    default:
+      return NULL;
   }
 }
 

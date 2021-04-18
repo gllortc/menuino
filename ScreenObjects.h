@@ -182,9 +182,10 @@ const uint8_t BMP_STOP[] = {
 // Screen returning parameters
 typedef struct 
 {
-  int      gotoScr  = UI_OBJECT_NULL; // MANDATORY
-  int      trackNum = 0;              // app defined
-  uint16_t address  = 0;              // app defined
+  uint8_t  gotoScr   = UI_OBJECT_NULL; // MANDATORY
+  uint8_t  inputMode = 0;
+  uint8_t  trackNum  = 0;              // app defined
+  uint16_t address   = 0;              // app defined
 } ScrParameters;
 
 #endif

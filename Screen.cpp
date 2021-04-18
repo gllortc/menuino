@@ -5,8 +5,7 @@
 //----------------------------------------------
 // Constructors
 //----------------------------------------------
-Screen::Screen() 
-{}
+Screen::Screen() {}
 
 //----------------------------------------------
 // Methods
@@ -29,9 +28,22 @@ void Screen::Dispatch(void)
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-void Screen::ClickHandler(uint8_t objId, ScrParameters *params) 
+ScrParameters* Screen::ClickHandler(uint8_t objId)
 { 
   Serial.println("WARN: Handling click in base class!");
+  return NULL;
+}
+
+//----------------------------------------------------------------------------------------------------
+// Preoare screen parameters to go to another screen
+//----------------------------------------------------------------------------------------------------
+ScrParameters* Screen::GotoScreen(uint8_t scrId, uint16_t addr = 0, uint8_t track = 0, uint8_t inputMode = 0)
+{
+  params.gotoScr   = scrId;
+  params.trackNum  = track;
+  params.address   = addr;
+  params.inputMode = inputMode;
+  return &params;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -54,10 +66,10 @@ uint8_t Screen::GetScreenClickedObjectID(int x, int y)
     {
       if (x >= uiObjects[i].x && x <= (uiObjects[i].x + uiObjects[i].width))
       {
-        Serial.println("X matches");
+        // Serial.println("X matches");
         if (y >= uiObjects[i].y && y <= (uiObjects[i].y + uiObjects[i].height))
         {
-          Serial.println("Y matches");
+          // Serial.println("Y matches");
           return i;
         }
       }

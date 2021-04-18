@@ -1,4 +1,5 @@
-#import <Arduino.h>
+#import  <Arduino.h>
+#include <EEPROM.h>
 #include "AddressScreen.h"
 #include "ScreenObjects.h"
 
@@ -37,6 +38,33 @@ void AddressScreen::Initialize(TouchDisplay lcdDisplay)
   AddPushButton(UI_ADDR_OK,     162, 285, 62, 42, COLOR_BTN_SUCCESS_NORMAL, COLOR_BTN_SUCCESS_PRESSED, 24, 24, BMP_OK);
 }
 
+//----------------------------------------------------------------------------------------------------
+// Virtual method that can be implemented by derived classes 
+// to show information when the screen is shown
+//----------------------------------------------------------------------------------------------------
+void AddressScreen::Shown(ScrParameters *params) 
+{
+  mode  = params->inputMode;
+  track = params->trackNum;
+
+  switch (mode)
+  {
+    case INPUT_MODE_MANUAL_ADDR:
+      SetScreenCaption("SET ENGINE ADR");
+      break;
+
+    case INPUT_MODE_TRACK_ADDR:
+      char buff[15] = "SET TRACK   ADR";
+      buff[10] = '0' + track;
+      SetScreenCaption(buff);
+      break;
+
+    case INPUT_MODE_DEVID:
+      SetScreenCaption("SET XPN DEVICE ID");
+      break;
+  }
+}
+
 //----------------------------------------------
 // Dispatch encoder movements and update menu
 //----------------------------------------------
@@ -45,10 +73,8 @@ void AddressScreen::Initialize(TouchDisplay lcdDisplay)
 //----------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------
-void AddressScreen::ClickHandler(uint8_t objId, ScrParameters *params) 
+ScrParameters* AddressScreen::ClickHandler(uint8_t objId)
 {
-  Serial.print("DriveScr object handled: "); Serial.println(objId);
-
   switch (objId)
   {
     case UI_ADDR_0:
@@ -66,18 +92,18 @@ void AddressScreen::ClickHandler(uint8_t objId, ScrParameters *params)
 
     case UI_ADDR_OK: 
       ToggleButtonState(objId);
-      params->gotoScr = SCR_DRIVE_ID;
-      params->address = GetNumericAddress();
-      break; 
+      return GotoScreen(SCR_DRIVE_ID, GetNumericAddress());
 
     case UI_ADDR_CANCEL: 
       ToggleButtonState(objId);
-      params->gotoScr = SCR_MENU_ID;
-      break; 
+      return GotoScreen(SCR_MENU_ID);
 
     case UI_ADDR_DEL: 
       DeleteButtonPressed(objId);
       break; 
+
+    default:
+      return NULL;
   }
 }
 
@@ -115,6 +141,33 @@ void AddressScreen::DeleteButtonPressed(uint8_t objId)
   txtAddress[addPos] = '\0';
    
   SetTextBoxText(GetUIObject(UI_ADDR_TXTBOX), txtAddress);
+}
+
+//----------------------------------------------
+// Delete button pressed
+//----------------------------------------------
+ScrParameters* AddressScreen::OkButtonPressed(uint8_t objId)
+{
+  uint16_t val = GetNumericAddress();
+  
+  switch (mode)
+  {
+    case INPUT_MODE_MANUAL_ADDR:
+      return GotoScreen(SCR_DRIVE_ID, val);
+
+    case INPUT_MODE_TRACK_ADDR:
+      EEPROM.write(((track - 1) * 2) + 1, highByte(val));
+      EEPROM.write(((track - 1) * 2) + 2, lowByte(val));
+      return GotoScreen(SCR_SETUP_ID, val);
+
+    case INPUT_MODE_DEVID:
+      byte id = lowByte(val);
+      EEPROM.write(0, id);
+      return GotoScreen(SCR_SETUP_ID, id);
+
+    default:
+      return NULL;
+  }
 }
 
 //----------------------------------------------

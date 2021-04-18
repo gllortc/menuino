@@ -28,36 +28,37 @@
 //----------------------------------------------
 typedef struct 
 {
-  bool           initialized    = false;
-  byte           type           = UI_OBJECT_NULL;
-  uint16_t       x              = 0;
-  uint16_t       y              = 0;
-  uint8_t        width          = 0;
-  uint8_t        height         = 0;
-  bool           pressed        = false;
-  uint16_t       colorPressed   = 0x0000;
-  uint16_t       colorUnpressed = 0x0000;
-  uint16_t       colorBorder    = 0x0000;
-  uint8_t        bmpWidth       = 0;
-  uint8_t        bmpHeight      = 0;
-  unsigned char *bitmap;
-  const char*    caption;
-  uint16_t       value          = 0;
+  bool            initialized    = false;
+  byte            type           = UI_OBJECT_NULL;
+  uint16_t        x              = 0;
+  uint16_t        y              = 0;
+  uint8_t         width          = 0;
+  uint8_t         height         = 0;
+  bool            pressed        = false;
+  uint16_t        colorPressed   = 0x0000;
+  uint16_t        colorUnpressed = 0x0000;
+  uint16_t        colorBorder    = 0x0000;
+  uint8_t         bmpWidth       = 0;
+  uint8_t         bmpHeight      = 0;
+  unsigned char  *bitmap;
+  const char*     caption;
+  uint16_t        value          = 0;
 } UIObject;
 
 class Screen
 {
-  UIObject      uiObjects[UI_MAX_OBJECTS];
+  ScrParameters   params;
+  UIObject        uiObjects[UI_MAX_OBJECTS];
 
 public:
 
-  TouchDisplay  disp;
-  uint8_t       id;         // Screen ID
-  const char*   caption;    // Screen caption
+  TouchDisplay    disp;
+  uint8_t         id;         // Screen ID
+  const char*     caption;    // Screen caption
 
   // Screen parameters
-  uint8_t       scrParamTrack   = 0;
-  uint16_t      scrParamAddress = 0;
+  uint8_t         scrParamTrack   = 0;
+  uint16_t        scrParamAddress = 0;
 
   //----------------------------------------------
   // Constructors
@@ -68,11 +69,12 @@ public:
   // Methods
   //----------------------------------------------
   virtual void Initialize(TouchDisplay lcdDisplay, uint8_t scrId, const char* scrCaption);
-  virtual void Dispatch(void);
+  virtual void Dispatch();
   virtual void Show(ScrParameters *params);
   virtual void Shown(ScrParameters *params);
-  virtual void ClickHandler(uint8_t objId, ScrParameters *params);
+  virtual ScrParameters* ClickHandler(uint8_t objId); //, ScrParameters *params);
 
+  ScrParameters* GotoScreen(uint8_t scrId, uint16_t addr = 0, uint8_t track = 0, uint8_t inputMode = 0);
   UIObject* GetUIObject(uint8_t objId);
   uint8_t GetScreenClickedObjectID(int x, int y);
   void SetScreenCaption(const char* newCaption);

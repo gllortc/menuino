@@ -16,6 +16,9 @@ void ScreenManager::Initialize()
   // Initialize the display
   scr.Initialize();
 
+  // Initialize the screen parameters
+  params = new ScrParameters();
+
   // Initialize the screens
   scrMenu = new MenuScreen();
   scrMenu->Initialize(scr);
@@ -33,7 +36,8 @@ void ScreenManager::Initialize()
   scrSetup->Initialize(scr);
 
   // Show initial screen
-  ShowScreen(SCR_MENU_ID);
+  params->gotoScr = SCR_MENU_ID;
+  ShowScreen(params);
 }
 
 //----------------------------------------------
@@ -56,13 +60,11 @@ void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
   Serial.print("Object clicked: ");
   Serial.println(objId);
 
-  ScrParameters params;
-
-  scrCurrent->ClickHandler(objId, &params);
-  if (params.gotoScr == UI_OBJECT_NULL) return;
+  params = scrCurrent->ClickHandler(objId); //, &params);
+  if (params == NULL) return;
 
   Serial.print("Moving to screen: ");
-  Serial.println(params.gotoScr);
+  Serial.println(params->gotoScr);
 
   ShowScreen(params);
 }
@@ -92,7 +94,7 @@ void ScreenManager::HandleMasterStatusNotify(uint8_t status)
 //----------------------------------------------
 // Gets the current screen instance
 //----------------------------------------------
-Screen* ScreenManager::GetCurrentScreen(void)
+Screen* ScreenManager::GetCurrentScreen()
 {
   return scrCurrent;
 }
@@ -100,48 +102,38 @@ Screen* ScreenManager::GetCurrentScreen(void)
 //----------------------------------------------
 // Set new current screen
 //----------------------------------------------
-void ScreenManager::ShowScreen(uint8_t gotoScr)
+void ScreenManager::ShowScreen(ScrParameters* params)
 {
-  ScrParameters params;
-  params.gotoScr = gotoScr;
-  ShowScreen(params);
-}
-
-//----------------------------------------------
-// Set new current screen
-//----------------------------------------------
-void ScreenManager::ShowScreen(ScrParameters params)
-{
-  switch (params.gotoScr)
+  switch (params->gotoScr)
   {
     case SCR_MENU_ID:
       scrCurrent = scrMenu;
-      scrCurrent->Show(&params);
+      scrCurrent->Show(params);
       break;
 
     case SCR_SELECT_ID:
       scrCurrent = scrSelect;
-      scrCurrent->Show(&params);
+      scrCurrent->Show(params);
       break;
 
     case SCR_DRIVE_ID:
       scrCurrent = scrDrive;
-      scrCurrent->Show(&params);
+      scrCurrent->Show(params);
       break;
 
     case SCR_ADDRESS_ID:
       scrCurrent = scrAddress;
-      scrCurrent->Show(&params);
+      scrCurrent->Show(params);
       break;
 
     case SCR_MESSAGE_ID:
       scrCurrent = scrMessage;
-      scrCurrent->Show(&params);
+      scrCurrent->Show(params);
       break;
 
     case SCR_SETUP_ID:
       scrCurrent = scrSetup;
-      scrCurrent->Show(&params);
+      scrCurrent->Show(params);
       break;
   }
 }

@@ -105,8 +105,8 @@ public:
   //----------------------------------------------
   void Initialize(TouchDisplay lcdDisplay);
   void Dispatch();
-  void Shown(ScrParameters *params) ;
-  void ClickHandler(uint8_t objId, ScrParameters *params) override;
+  void Shown(ScrParameters *params);
+  ScrParameters* ClickHandler(uint8_t objId) override;
 
   // XPN methods
   uint8_t GetCV17AdrHighByte(uint16_t address);

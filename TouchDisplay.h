@@ -56,7 +56,7 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize();
-  void Dispatch(void);
+  void Dispatch();
   void DrawBaseScreen(const char* caption);
   void PrintTextLine(const char *text);
   void PrintErrTextLine(const char *text);

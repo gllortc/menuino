@@ -27,13 +27,15 @@ void MsgScreen::Dispatch() {}
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-void MsgScreen::ClickHandler(uint8_t objId, ScrParameters *params) 
+ScrParameters* MsgScreen::ClickHandler(uint8_t objId)
 {
   switch (objId)
   {
     case UI_MSG_OK:
       ToggleButtonState(objId);
-      params->gotoScr = SCR_MENU_ID;
-      break;
+      return GotoScreen(SCR_MENU_ID);
+
+    default:
+      return NULL;
   }
 }

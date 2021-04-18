@@ -56,25 +56,23 @@ void MenuScreen::Dispatch()
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-void MenuScreen::ClickHandler(uint8_t objId, ScrParameters *returnParams) 
+ScrParameters* MenuScreen::ClickHandler(uint8_t objId)
 {
-  Serial.print("Handling object "); Serial.println(objId);
-
   switch (objId)
   {
     case UI_MENU_SELECT:
       ToggleButtonState(objId);
-      returnParams->gotoScr = SCR_SELECT_ID;
-      break;
+      return GotoScreen(SCR_SELECT_ID);
 
     case UI_MENU_MANUAL:
       ToggleButtonState(objId);
-      returnParams->gotoScr = SCR_ADDRESS_ID;
-      break;
+      return GotoScreen(SCR_ADDRESS_ID);
 
     case UI_MENU_SETUP:
       ToggleButtonState(objId);
-      returnParams->gotoScr = SCR_SETUP_ID;
-      break;
+      return GotoScreen(SCR_SETUP_ID);
+
+    default:
+      return NULL;
   }
 }
