@@ -116,7 +116,6 @@ public:
   void GetEngineFuncs();
   void SetEngineSpeed(uint8_t speed);
   void ToggleEngineFunction(uint8_t funcNum);
-  uint8_t GetXPNDeviceID();
 
   void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
   void HandleMasterStatusNotify(uint8_t status);

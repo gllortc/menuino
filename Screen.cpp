@@ -133,6 +133,14 @@ void Screen::SetScreenCaption(const char* newCaption)
 }
 
 //----------------------------------------------------------------------------------------------------
+// Change an UI object caption without drawing it
+//----------------------------------------------------------------------------------------------------
+void Screen::SetObjectCaption(uint8_t objId, char* newCaption)
+{
+  uiObjects[objId].caption = newCaption;
+}
+
+//----------------------------------------------------------------------------------------------------
 // Add a check button to the current screen
 //----------------------------------------------------------------------------------------------------
 void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption)
@@ -457,4 +465,39 @@ void Screen::DrawBitmap(UIObject* obj)
    // Train picture
    disp.tft.fillRect(obj->x, obj->y, obj->width, obj->height, obj->colorUnpressed); 
    disp.tft.drawBitmap(obj->x, obj->y, obj->bitmap, obj->width, obj->height, 0xFFFFFF);
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Gets the associated digital address from the EEPROM for the specified track number
+//----------------------------------------------------------------------------------------------------
+uint16_t Screen::GetTrackAddress(uint8_t trackNum)
+{
+  return (EEPROM.read(((trackNum - 1) * 2) + 1) << 8) + EEPROM.read(((trackNum - 1) * 2) + 2);
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Sets the associated digital address to a track number in the EEPROM
+//----------------------------------------------------------------------------------------------------
+void Screen::SetTrackAddress(uint8_t track, uint16_t address)
+{
+  EEPROM.write(((track - 1) * 2) + 1, highByte(address));
+  EEPROM.write(((track - 1) * 2) + 2, lowByte(address));
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Gets the XPN digital ID from the EEPROM (default value: 25)
+//----------------------------------------------------------------------------------------------------
+uint8_t Screen::GetDeviceID()
+{
+  uint8_t xpnDeviceID = EEPROM.read(0);
+  if (xpnDeviceID <= 0 || xpnDeviceID > 31) xpnDeviceID = 25;
+  return xpnDeviceID;
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Sets the XPN device ID in the EEPROM
+//----------------------------------------------------------------------------------------------------
+void Screen::SetDeviceID(uint8_t id = 25)
+{
+  EEPROM.write(0, id);
 }

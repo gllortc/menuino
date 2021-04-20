@@ -45,7 +45,7 @@ void DriveScreen::Initialize(TouchDisplay lcdDisplay)
   // Progress bar
   AddProgressBar(UI_CTRL_PGBAR,         18, 355, 204, 20, COLOR_PGB_BACKGROUND,   COLOR_PGB_BORDER,         COLOR_PGB_FILL, 0); // activeEngine.speed);
 
-  GetXPNDeviceID();
+  xpnDeviceID = Screen::GetDeviceID();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -54,6 +54,11 @@ void DriveScreen::Initialize(TouchDisplay lcdDisplay)
 //----------------------------------------------------------------------------------------------------
 void DriveScreen::Shown(ScrParameters *params) 
 {
+  Serial.print("params.gotoScr: "); Serial.println(params->gotoScr); 
+  Serial.print("params.inputMode: "); Serial.println(params->inputMode); 
+  Serial.print("params.trackNum: "); Serial.println(params->trackNum); 
+  Serial.print("params.address: "); Serial.println(params->address); 
+  
   if (params->trackNum > 0)
   {
     char buff[8] = "TRACK ";
@@ -75,8 +80,6 @@ void DriveScreen::Shown(ScrParameters *params)
   disp.tft.setTextSize(3);
   disp.tft.setCursor(18, 100);
   disp.tft.print(params->address);
-
-  
 
   // Start XPN communications
   xpn.start(xpnDeviceID, XPN_TXRX_PIN); // Start XPN
@@ -241,13 +244,6 @@ void DriveScreen::ToggleEngineFunction(uint8_t funcNum)
     xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_ON, funcNum);
     bitSet(engine.func.Bits, funcNum);
   }
-}
-
-uint8_t DriveScreen::GetXPNDeviceID()
-{
-  xpnDeviceID = EEPROM.read(0);
-  if (xpnDeviceID <= 0 || xpnDeviceID > 31) xpnDeviceID = 25;
-  return xpnDeviceID;
 }
 
 void DriveScreen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)

@@ -35,10 +35,6 @@ void loop()
 //----------------------------------------------
 void OnClick(uint16_t xpos, uint16_t ypos) 
 {
-  Serial.print("Click -> "); 
-  Serial.print("x:"); Serial.print(xpos); Serial.print(" ");
-  Serial.print("y:"); Serial.println(ypos);
-
   manager.HandleScreenClick(xpos, ypos);
 }
 

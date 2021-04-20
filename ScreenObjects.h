@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 #ifndef _SCREENOBJECTS_H 
 #define _SCREENOBJECTS_H 
 

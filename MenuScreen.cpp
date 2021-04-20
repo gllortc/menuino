@@ -1,6 +1,7 @@
-#import <Arduino.h>
+#import  <Arduino.h>
 #include <Encoder.h>
 #include "MenuScreen.h"
+#include "AddressScreen.h"
 #include "ScreenObjects.h"
 #include <Encoder_Polling.h>
 
@@ -66,7 +67,7 @@ ScrParameters* MenuScreen::ClickHandler(uint8_t objId)
 
     case UI_MENU_MANUAL:
       ToggleButtonState(objId);
-      return GotoScreen(SCR_ADDRESS_ID);
+      return GotoScreen(SCR_ADDRESS_ID, 0, 0, INPUT_MODE_MANUAL_ADDR);
 
     case UI_MENU_SETUP:
       ToggleButtonState(objId);

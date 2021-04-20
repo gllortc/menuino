@@ -44,6 +44,11 @@ void AddressScreen::Initialize(TouchDisplay lcdDisplay)
 //----------------------------------------------------------------------------------------------------
 void AddressScreen::Shown(ScrParameters *params) 
 {
+  Serial.print("params.gotoScr: "); Serial.println(params->gotoScr); 
+  Serial.print("params.inputMode: "); Serial.println(params->inputMode); 
+  Serial.print("params.trackNum: "); Serial.println(params->trackNum); 
+  Serial.print("params.address: "); Serial.println(params->address); 
+
   mode  = params->inputMode;
   track = params->trackNum;
 
@@ -52,9 +57,9 @@ void AddressScreen::Shown(ScrParameters *params)
     case INPUT_MODE_MANUAL_ADDR:
       SetScreenCaption("SET ENGINE ADR");
       break;
-
+    
     case INPUT_MODE_TRACK_ADDR:
-      char buff[15] = "SET TRACK   ADR";
+      char buff[16] = "SET TRACK   ADR\0";
       buff[10] = '0' + track;
       SetScreenCaption(buff);
       break;
@@ -91,8 +96,7 @@ ScrParameters* AddressScreen::ClickHandler(uint8_t objId)
       break;
 
     case UI_ADDR_OK: 
-      ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, GetNumericAddress());
+      return OkButtonPressed(objId);
 
     case UI_ADDR_CANCEL: 
       ToggleButtonState(objId);
@@ -101,10 +105,9 @@ ScrParameters* AddressScreen::ClickHandler(uint8_t objId)
     case UI_ADDR_DEL: 
       DeleteButtonPressed(objId);
       break; 
-
-    default:
-      return NULL;
   }
+
+  return NULL;
 }
 
 //----------------------------------------------
@@ -112,14 +115,14 @@ ScrParameters* AddressScreen::ClickHandler(uint8_t objId)
 //----------------------------------------------
 void AddressScreen::DigitPressed(uint8_t objId)
 {
+  ToggleButtonState(objId);
+  
   if (addPos == 4) 
   {
     addPos = 0;
     txtAddress[0] = txtAddress[1] = txtAddress[2] = txtAddress[3] = '\0';
   }
 
-  ToggleButtonState(objId);
-   
   txtAddress[addPos] = 48 + objId;
   txtAddress[addPos + 1] = '\0';
   addPos++;
@@ -148,21 +151,21 @@ void AddressScreen::DeleteButtonPressed(uint8_t objId)
 //----------------------------------------------
 ScrParameters* AddressScreen::OkButtonPressed(uint8_t objId)
 {
-  uint16_t val = GetNumericAddress();
+  uint16_t inputValue = GetNumericAddress();
+
+  ToggleButtonState(objId);
   
   switch (mode)
   {
     case INPUT_MODE_MANUAL_ADDR:
-      return GotoScreen(SCR_DRIVE_ID, val);
+      return GotoScreen(SCR_DRIVE_ID, inputValue);
 
     case INPUT_MODE_TRACK_ADDR:
-      EEPROM.write(((track - 1) * 2) + 1, highByte(val));
-      EEPROM.write(((track - 1) * 2) + 2, lowByte(val));
-      return GotoScreen(SCR_SETUP_ID, val);
+      Screen::SetTrackAddress(track, inputValue);
+      return GotoScreen(SCR_SETUP_ID, inputValue);
 
     case INPUT_MODE_DEVID:
-      byte id = lowByte(val);
-      EEPROM.write(0, id);
+      Screen::SetDeviceID(lowByte(inputValue));
       return GotoScreen(SCR_SETUP_ID, id);
 
     default:

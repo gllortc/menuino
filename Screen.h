@@ -78,6 +78,7 @@ public:
   UIObject* GetUIObject(uint8_t objId);
   uint8_t GetScreenClickedObjectID(int x, int y);
   void SetScreenCaption(const char* newCaption);
+  void SetObjectCaption(uint8_t objId, char* newCaption);
   
   void AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption);
   void AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap);
@@ -100,6 +101,12 @@ public:
 
   void AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t bgColor, const char* fileName);
   void DrawBitmap(UIObject* obj);
+
+  // Settings management
+  static uint16_t GetTrackAddress(uint8_t trackNum);
+  static void SetTrackAddress(uint8_t track, uint16_t address);
+  static uint8_t GetDeviceID();
+  static void SetDeviceID(uint8_t id = 25);
   
 };
 
