@@ -4,7 +4,7 @@
 
 ## UI system for Arduino and touchscreens
 
-This project is a simple way to create a complete UI system for TDT/LCD touchscreens for the Arduino microcontrollers (and other supported platforms). Actually the systems supports de following UI elements for the screens:
+This project is a simple way to create a complete UI system for TFT/LCD touchscreens for the Arduino microcontrollers (and other supported platforms). Actually the systems supports de following UI elements for the screens:
 
 * *Text labels*: Text that can be changed by the code (for example, the temperature)
 * *Push buttons*: Momentary pushbuttons
