@@ -24,13 +24,10 @@
 #define UI_ADDR_TRACK4   7
 #define UI_SELECT_RETURN 8
 
-#define ENCODER_PIN_A   22
-#define ENCODER_PIN_B   23
-
 class SelectScreen : public Screen
 {
-  uint8_t   selIdx;           // Selected menu ID
-  long      oldEncPos    = -999;
+  uint8_t selIdx;   // Selected menu ID
+  uint8_t selPrev;  // Selected menu ID
 
 public:
 
@@ -42,10 +39,10 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(TouchDisplay lcdDisplay);
-  void Dispatch();
+  void Initialize(HwdManager lcdDisplay);
   void Shown(ScrParameters *params) override;
   ScrParameters* ClickHandler(uint8_t objId) override;
+  void EncoderHandler(uint8_t dir) override;
 
 private:
 

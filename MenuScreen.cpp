@@ -1,9 +1,7 @@
 #import  <Arduino.h>
-#include <Encoder.h>
 #include "MenuScreen.h"
-#include "AddressScreen.h"
+#include "InputScreen.h"
 #include "ScreenObjects.h"
-#include <Encoder_Polling.h>
 
 //----------------------------------------------
 // Constructor
@@ -13,34 +11,29 @@ MenuScreen::MenuScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void MenuScreen::Initialize(TouchDisplay lcdDisplay)
+void MenuScreen::Initialize(HwdManager lcdDisplay)
 {
   disp    = lcdDisplay;
   id      = SCR_MENU_ID;
-  caption = "MAIN MENU";
+  caption = LNG_EN_MENU_HEADER;
 
-  encoder_begin(ENCODER_PIN_1, ENCODER_PIN_2);
-
-  AddMenuButton(UI_MENU_SELECT, 5,  80, 230, 40, 0x0000, 0x1AAE, "Select train");
-  AddMenuButton(UI_MENU_MANUAL, 5, 125, 230, 40, 0x0000, 0x1AAE, "Manual drive");
-  AddMenuButton(UI_MENU_SETUP,  5, 170, 230, 40, 0x0000, 0x1AAE, "Settings");
+  AddMenuButton(UI_MENU_SELECT, 5,  80, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_MENU_OPT_SELECT);
+  AddMenuButton(UI_MENU_MANUAL, 5, 125, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_MENU_OPT_DRIVE);
+  AddMenuButton(UI_MENU_SETUP,  5, 170, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_MENU_OPT_SETUP);
 }
 
 //----------------------------------------------
 // Dispatch encoder movements and update menu
 //----------------------------------------------
-void MenuScreen::Dispatch()
+void MenuScreen::EncoderHandler(uint8_t dir)
 {
-  int selPrev = selIdx;
-  int dir = encoder_data();
-
-  if(dir == 1)       // Forward
+  if (dir == 1)       // Forward
   {
     selIdx--;
     if (selIdx < 0) selIdx = MENU_OPTIONS_COUNT - 1;
     Serial.println("Menu DOWN");
   }
-  else if(dir == -1) // Backward
+  else if (dir == -1) // Backward
   {
     selIdx++;
     if (selIdx >= MENU_OPTIONS_COUNT) selIdx = 0;

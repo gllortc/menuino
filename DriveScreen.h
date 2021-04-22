@@ -21,10 +21,6 @@
 #define FUNC_ON               1
 #define FUNC_CHANGE           2
 
-// Hardware PINs used
-#define ENCODER_PIN_1         22
-#define ENCODER_PIN_2         23
-
 #define XPN_TXRX_PIN          9 // MAX485 pin
 
 #define UI_CTRL_F0            0
@@ -103,7 +99,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(TouchDisplay lcdDisplay);
+  void Initialize(HwdManager lcdDisplay);
   void Dispatch();
   void Shown(ScrParameters *params);
   ScrParameters* ClickHandler(uint8_t objId) override;

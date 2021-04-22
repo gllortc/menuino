@@ -1,5 +1,4 @@
 #import <Arduino.h>
-#include <Encoder.h>
 #include "ScreenObjects.h"
 #include "ScreenManager.h"
 
@@ -29,8 +28,8 @@ void ScreenManager::Initialize()
   scrDrive = new DriveScreen();
   scrDrive->Initialize(scr);
 
-  scrAddress = new AddressScreen();
-  scrAddress->Initialize(scr);
+  scrInput = new InputScreen();
+  scrInput->Initialize(scr);
 
   scrSetup = new SetupScreen();
   scrSetup->Initialize(scr);
@@ -67,6 +66,14 @@ void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
   Serial.println(params->gotoScr);
 
   ShowScreen(params);
+}
+
+//----------------------------------------------
+// Handle the encoder movement
+//----------------------------------------------
+void ScreenManager::HandleEncoderMovement(uint8_t dir)
+{
+  
 }
 
 //----------------------------------------------
@@ -122,7 +129,7 @@ void ScreenManager::ShowScreen(ScrParameters* params)
       break;
 
     case SCR_ADDRESS_ID:
-      scrCurrent = scrAddress;
+      scrCurrent = scrInput;
       scrCurrent->Show(params);
       break;
 

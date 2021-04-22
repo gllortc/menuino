@@ -1,9 +1,7 @@
 #import  <Arduino.h>
 #include <EEPROM.h>
-#include <Encoder.h>
 #include "SelectScreen.h"
 #include "ScreenObjects.h"
-#include <Encoder_Polling.h>
 
 //----------------------------------------------
 // Constructor
@@ -13,13 +11,11 @@ SelectScreen::SelectScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void SelectScreen::Initialize(TouchDisplay lcdDisplay)
+void SelectScreen::Initialize(HwdManager lcdDisplay)
 {
   disp    = lcdDisplay;
   id      = SCR_SELECT_ID;
   caption = "SELECT TRAIN";
-
-  encoder_begin(ENCODER_PIN_A, ENCODER_PIN_B);
 
   AddMenuButton(UI_SELECT_TRACK1, 5,  80, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Track 1");
   AddMenuButton(UI_SELECT_TRACK2, 5, 125, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Track 2");
@@ -50,17 +46,16 @@ void SelectScreen::Shown(ScrParameters *params)
 //----------------------------------------------
 // Dispatch encoder movements and update menu
 //----------------------------------------------
-void SelectScreen::Dispatch()
+void SelectScreen::EncoderHandler(uint8_t dir)
 {
   int selPrev = selIdx;
-  int dir = encoder_data();
 
-  if(dir == 1)       // Forward
+  if (dir == 1)       // Forward
   {
     selIdx--;
     if (selIdx < 0) selIdx = MENU_OPTIONS_COUNT - 1;
   }
-  else if(dir == -1) // Backward
+  else if (dir == -1) // Backward
   {
     selIdx++;
     if (selIdx >= MENU_OPTIONS_COUNT) selIdx = 0;

@@ -1,5 +1,6 @@
+#include <EEPROM.h>
 #include "Screen.h"
-#include "TouchDisplay.h" 
+#include "HwdManager.h" 
 #include "ScreenObjects.h" 
 
 //----------------------------------------------
@@ -10,7 +11,7 @@ Screen::Screen() {}
 //----------------------------------------------
 // Methods
 //----------------------------------------------
-void Screen::Initialize(TouchDisplay lcdDisplay, uint8_t scrId, const char* scrCaption)
+void Screen::Initialize(HwdManager lcdDisplay, uint8_t scrId, const char* scrCaption)
 {
   id      = scrId;
   caption = scrCaption;
@@ -26,13 +27,18 @@ void Screen::Dispatch(void)
 }
 
 //----------------------------------------------------------------------------------------------------
-// Hadle screen clicks
+// Handle screen clicks
 //----------------------------------------------------------------------------------------------------
 ScrParameters* Screen::ClickHandler(uint8_t objId)
 { 
   Serial.println("WARN: Handling click in base class!");
   return NULL;
 }
+
+//----------------------------------------------------------------------------------------------------
+// Handle encoder movements
+//----------------------------------------------------------------------------------------------------
+void Screen::EncoderHandler(uint8_t dir) {}
 
 //----------------------------------------------------------------------------------------------------
 // Preoare screen parameters to go to another screen
@@ -386,6 +392,8 @@ void Screen::DrawTextBox(UIObject* obj)
    disp.tft.setTextSize(3);
    disp.tft.setCursor(obj->x + 10, obj->y + 10);
    disp.tft.print(obj->caption);
+
+   Serial.print("TxtBox printed! Val: "); Serial.println(obj->caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -393,6 +401,8 @@ void Screen::DrawTextBox(UIObject* obj)
 //----------------------------------------------------------------------------------------------------
 void Screen::SetTextBoxText(UIObject* obj, const char* text)
 {
+   Serial.print("TxtBox set! Val: "); Serial.println(text);
+  
    obj->caption = text;
    DrawTextBox(obj);
 }

@@ -28,8 +28,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(TouchDisplay lcdDisplay);
-  void Dispatch();
+  void Initialize(HwdManager lcdDisplay);
   ScrParameters* ClickHandler(uint8_t objId) override;
 
 };

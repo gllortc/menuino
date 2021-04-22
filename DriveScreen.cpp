@@ -2,7 +2,6 @@
 #include <EEPROM.h>
 #include "DriveScreen.h"
 #include "ScreenObjects.h"
-#include <Encoder_Polling.h>
 
 //----------------------------------------------
 // Constructor
@@ -12,13 +11,11 @@ DriveScreen::DriveScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void DriveScreen::Initialize(TouchDisplay lcdDisplay)
+void DriveScreen::Initialize(HwdManager lcdDisplay)
 {
   disp    = lcdDisplay;
   id      = SCR_DRIVE_ID;
   caption = "";
-
-  encoder_begin(ENCODER_PIN_1, ENCODER_PIN_2);
 
   AddPushButton(UI_CTRL_RETURN,         180, 85, 42, 42,  COLOR_BTN_INFO_NORMAL,  COLOR_BTN_INFO_PRESSED,   24, 24, BMP_RETURN);
 
@@ -66,7 +63,7 @@ void DriveScreen::Shown(ScrParameters *params)
     SetScreenCaption(buff);
   }
   else
-    SetScreenCaption("MANUAL DRIVE");
+    SetScreenCaption(LNG_EN_DRIVE_HEADER_MANUAL);
 
   disp.tft.setTextSize(1);
 

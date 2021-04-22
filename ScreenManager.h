@@ -10,23 +10,23 @@
 #define _SCREENMANAGER_H 
 
 #import  <Arduino.h>
-#include "TouchDisplay.h" 
+#include "HwdManager.h" 
 #include "MenuScreen.h" 
 #include "SelectScreen.h" 
 #include "DriveScreen.h" 
-#include "AddressScreen.h" 
+#include "InputScreen.h" 
 #include "MsgScreen.h" 
 #include "SetupScreen.h" 
 
 class ScreenManager 
 {
-  TouchDisplay   scr;
+  HwdManager   scr;
 
   Screen*        scrCurrent;
   MenuScreen*    scrMenu;
   SelectScreen*  scrSelect;
   DriveScreen*   scrDrive;
-  AddressScreen* scrAddress;
+  InputScreen*   scrInput;
   MsgScreen*     scrMessage;
   SetupScreen*   scrSetup;
 
@@ -46,6 +46,7 @@ public:
   void Dispatch();
   void ShowScreen(ScrParameters* params);
   void HandleScreenClick(uint16_t xpos, uint16_t ypos);
+  void HandleEncoderMovement(uint8_t dir);
   void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
   void HandleMasterStatusNotify(uint8_t status);
   Screen* GetCurrentScreen();

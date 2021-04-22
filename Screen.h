@@ -10,7 +10,7 @@
 #define _SCREEN_H 
 
 #import  <Arduino.h>
-#include "TouchDisplay.h" 
+#include "HwdManager.h" 
 #include "ScreenObjects.h" 
 
 #define UI_MAX_OBJECTS          20
@@ -52,7 +52,7 @@ class Screen
 
 public:
 
-  TouchDisplay    disp;
+  HwdManager    disp;
   uint8_t         id;         // Screen ID
   const char*     caption;    // Screen caption
 
@@ -68,11 +68,12 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  virtual void Initialize(TouchDisplay lcdDisplay, uint8_t scrId, const char* scrCaption);
+  virtual void Initialize(HwdManager lcdDisplay, uint8_t scrId, const char* scrCaption);
   virtual void Dispatch();
   virtual void Show(ScrParameters *params);
   virtual void Shown(ScrParameters *params);
-  virtual ScrParameters* ClickHandler(uint8_t objId); //, ScrParameters *params);
+  virtual ScrParameters* ClickHandler(uint8_t objId);
+  virtual void EncoderHandler(uint8_t dir);
 
   ScrParameters* GotoScreen(uint8_t scrId, uint16_t addr = 0, uint8_t track = 0, uint8_t inputMode = 0);
   UIObject* GetUIObject(uint8_t objId);

@@ -2,7 +2,6 @@
 // Library includes
 //------------------------------------------------------------------
 
-#include "TouchDisplay.h" 
 #include "ScreenManager.h" 
 
 // Pin 13 has an LED connected on most Arduino boards.
@@ -36,6 +35,14 @@ void loop()
 void OnClick(uint16_t xpos, uint16_t ypos) 
 {
   manager.HandleScreenClick(xpos, ypos);
+}
+
+//----------------------------------------------
+// Encoder callback
+//----------------------------------------------
+void OnEncoderMoved(uint8_t dir)
+{
+  
 }
 
 //------------------------------------------------------

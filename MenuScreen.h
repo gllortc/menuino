@@ -19,14 +19,10 @@
 #define UI_MENU_MANUAL  1
 #define UI_MENU_SETUP   2
 
-// Hardware PINs used
-#define ENCODER_PIN_1   22
-#define ENCODER_PIN_2   23
-
 class MenuScreen : public Screen
 {
-  uint8_t   selIdx;           // Selected menu ID
-  long      oldEncPos    = -999;
+  uint8_t   selIdx  = 0;  // Selected menu ID
+  uint8_t   selPrev = 0;  // Selected menu ID
 
 public:
 
@@ -38,9 +34,9 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(TouchDisplay lcdDisplay);
-  void Dispatch();
+  void Initialize(HwdManager lcdDisplay);
   ScrParameters* ClickHandler(uint8_t objId) override;
+  void EncoderHandler(uint8_t dir) override;
   
 };
 

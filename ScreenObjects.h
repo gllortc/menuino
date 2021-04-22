@@ -1,5 +1,3 @@
-#include <EEPROM.h>
-
 #ifndef _SCREENOBJECTS_H 
 #define _SCREENOBJECTS_H 
 
@@ -180,6 +178,13 @@ const uint8_t BMP_STOP[] = {
 #define COLOR_PGB_BACKGROUND            0x3186
 #define COLOR_PGB_BORDER                0x02B3
 #define COLOR_PGB_FILL                  0x1AAE
+
+// Static text
+const char LNG_EN_MENU_HEADER[]         = "MAIN MENU";
+const char LNG_EN_MENU_OPT_SELECT[]     = "Select train";
+const char LNG_EN_MENU_OPT_DRIVE[]      = "Manual drive";
+const char LNG_EN_MENU_OPT_SETUP[]      = "Settings";
+const char LNG_EN_DRIVE_HEADER_MANUAL[] = "MANUAL DRIVE";
 
 // Screen returning parameters
 typedef struct 
