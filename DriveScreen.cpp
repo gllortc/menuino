@@ -41,8 +41,6 @@ void DriveScreen::Initialize(HwdManager lcdDisplay)
    
   // Progress bar
   AddProgressBar(UI_CTRL_PGBAR,         18, 355, 204, 20, COLOR_PGB_BACKGROUND,   COLOR_PGB_BORDER,         COLOR_PGB_FILL, 0); // activeEngine.speed);
-
-  xpnDeviceID = Screen::GetDeviceID();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -51,29 +49,45 @@ void DriveScreen::Initialize(HwdManager lcdDisplay)
 //----------------------------------------------------------------------------------------------------
 void DriveScreen::Shown(ScrParameters *params) 
 {
+  xpnDeviceID = Screen::GetDeviceID();
+
   Serial.print("params.gotoScr: "); Serial.println(params->gotoScr); 
   Serial.print("params.inputMode: "); Serial.println(params->inputMode); 
   Serial.print("params.trackNum: "); Serial.println(params->trackNum); 
   Serial.print("params.address: "); Serial.println(params->address); 
   
-  if (params->trackNum > 0)
+  switch (params->trackNum)
   {
-    char buff[8] = "TRACK ";
-    buff[6] = '0' + params->trackNum;
-    SetScreenCaption(buff);
+    case 1:
+      SetScreenCaption(LNG_EN_DRIVE_HEADER_TRACK_1);
+      break;
+
+    case 2:
+      SetScreenCaption(LNG_EN_DRIVE_HEADER_TRACK_2);
+      break;
+
+    case 3:
+      SetScreenCaption(LNG_EN_DRIVE_HEADER_TRACK_3);
+      break;
+
+    case 4:
+      SetScreenCaption(LNG_EN_DRIVE_HEADER_TRACK_4);
+      break;
+       
+    default:
+      SetScreenCaption(LNG_EN_DRIVE_HEADER_MANUAL);
+       break;
   }
-  else
-    SetScreenCaption(LNG_EN_DRIVE_HEADER_MANUAL);
 
   disp.tft.setTextSize(1);
 
   char id[2];
   disp.tft.setCursor(4, 8);
-  disp.tft.print("Device #");
+  disp.tft.print(LNG_EN_DRIVE_DEVICEID);
   disp.tft.print(itoa(xpnDeviceID, id, 10));
   
   disp.tft.setCursor(18, 85);
-  disp.tft.print("ADDRESS");
+  disp.tft.print(LNG_EN_DRIVE_ADR);
   disp.tft.setTextSize(3);
   disp.tft.setCursor(18, 100);
   disp.tft.print(params->address);

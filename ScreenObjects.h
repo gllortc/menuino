@@ -180,11 +180,41 @@ const uint8_t BMP_STOP[] = {
 #define COLOR_PGB_FILL                  0x1AAE
 
 // Static text
-const char LNG_EN_MENU_HEADER[]         = "MAIN MENU";
-const char LNG_EN_MENU_OPT_SELECT[]     = "Select train";
-const char LNG_EN_MENU_OPT_DRIVE[]      = "Manual drive";
-const char LNG_EN_MENU_OPT_SETUP[]      = "Settings";
-const char LNG_EN_DRIVE_HEADER_MANUAL[] = "MANUAL DRIVE";
+const char LNG_EN_INI_HEADER[]           = "TRAIN CONTROL";
+const char LNG_EN_INI_VERSION[]          = "Running MENUINO UI version 1.1";
+const char LNG_EN_INI_HDW[]              = "> Initializing hardware";
+const char LNG_EN_INI_READY[]            = "> Ready!";
+const char LNG_EN_MENU_HEADER[]          = "MAIN MENU";
+const char LNG_EN_MENU_OPT_SELECT[]      = "Select train";
+const char LNG_EN_MENU_OPT_DRIVE[]       = "Manual drive";
+const char LNG_EN_MENU_OPT_SETUP[]       = "Settings";
+const char LNG_EN_DRIVE_HEADER_MANUAL[]  = "MANUAL DRIVE";
+const char LNG_EN_DRIVE_HEADER_TRACK_1[] = "TRACK 1";
+const char LNG_EN_DRIVE_HEADER_TRACK_2[] = "TRACK 2";
+const char LNG_EN_DRIVE_HEADER_TRACK_3[] = "TRACK 3";
+const char LNG_EN_DRIVE_HEADER_TRACK_4[] = "TRACK 4";
+const char LNG_EN_DRIVE_ADR[]            = "ADDRESS";
+const char LNG_EN_DRIVE_DEVICEID[]       = "XPN #";
+const char LNG_EN_INPUT_HEADER[]         = "INPUT VALUE";
+const char LNG_EN_INPUT_HEADER_MANUAL[]  = "SET ENGINE ADR";
+const char LNG_EN_INPUT_HEADER_TRACK_1[] = "SET TRACK 1 ADR";
+const char LNG_EN_INPUT_HEADER_TRACK_2[] = "SET TRACK 2 ADR";
+const char LNG_EN_INPUT_HEADER_TRACK_3[] = "SET TRACK 3 ADR";
+const char LNG_EN_INPUT_HEADER_TRACK_4[] = "SET TRACK 4 ADR";
+const char LNG_EN_INPUT_HEADER_DEVICE[]  = "SET XpressNet ID";
+const char LNG_EN_SELECT_HEADER[]        = "SELECT TRAIN";
+const char LNG_EN_SELECT_OPT_TRACK_1[]   = "Track 1";
+const char LNG_EN_SELECT_OPT_TRACK_2[]   = "Track 2";
+const char LNG_EN_SELECT_OPT_TRACK_3[]   = "Track 3";
+const char LNG_EN_SELECT_OPT_TRACK_4[]   = "Track 4";
+const char LNG_EN_SELECT_OPT_BACK[]      = "Back";
+const char LNG_EN_SETUP_HEADER[]         = "SETTINGS";
+const char LNG_EN_SETUP_OPT_TRACK_1[]    = "Track 1";
+const char LNG_EN_SETUP_OPT_TRACK_2[]    = "Track 2";
+const char LNG_EN_SETUP_OPT_TRACK_3[]    = "Track 3";
+const char LNG_EN_SETUP_OPT_TRACK_4[]    = "Track 4";
+const char LNG_EN_SETUP_OPT_DEVICEID[]   = "XPN ID";
+const char LNG_EN_SETUP_OPT_BACK[]       = "Back";
 
 // Screen returning parameters
 typedef struct 

@@ -15,13 +15,13 @@ void SelectScreen::Initialize(HwdManager lcdDisplay)
 {
   disp    = lcdDisplay;
   id      = SCR_SELECT_ID;
-  caption = "SELECT TRAIN";
+  caption = LNG_EN_SELECT_HEADER;
 
-  AddMenuButton(UI_SELECT_TRACK1, 5,  80, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Track 1");
-  AddMenuButton(UI_SELECT_TRACK2, 5, 125, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Track 2");
-  AddMenuButton(UI_SELECT_TRACK3, 5, 170, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Track 3");
-  AddMenuButton(UI_SELECT_TRACK4, 5, 215, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Track 4");
-  AddMenuButton(UI_SELECT_RETURN, 5, 260, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Back", 24, 24, BMP_RETURN);
+  AddMenuButton(UI_SELECT_TRACK1, 5,  80, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_SELECT_OPT_TRACK_1);
+  AddMenuButton(UI_SELECT_TRACK2, 5, 125, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_SELECT_OPT_TRACK_2);
+  AddMenuButton(UI_SELECT_TRACK3, 5, 170, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_SELECT_OPT_TRACK_3);
+  AddMenuButton(UI_SELECT_TRACK4, 5, 215, 150, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_SELECT_OPT_TRACK_4);
+  AddMenuButton(UI_SELECT_RETURN, 5, 260, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_SELECT_OPT_BACK, 24, 24, BMP_RETURN);
 } 
 
 //----------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ void SelectScreen::Initialize(HwdManager lcdDisplay)
 //----------------------------------------------------------------------------------------------------
 void SelectScreen::Shown(ScrParameters *params) 
 {
-  char     sadr[5];
+  char sadr[5];
 
   disp.tft.setTextSize(2);
   disp.tft.setTextColor(COLOR_SCR_TEXT);
