@@ -1,4 +1,4 @@
-#import <Arduino.h>
+#include <Arduino.h>
 #include "ScreenObjects.h"
 #include "ScreenManager.h"
 
@@ -56,14 +56,8 @@ void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
   uint8_t objId = scrCurrent->GetScreenClickedObjectID(xpos, ypos);
   if (objId == UI_OBJECT_NULL) return;
 
-  Serial.print("Object clicked: ");
-  Serial.println(objId);
-
   params = scrCurrent->ClickHandler(objId); //, &params);
   if (params == NULL) return;
-
-  Serial.print("Moving to screen: ");
-  Serial.println(params->gotoScr);
 
   ShowScreen(params);
 }
@@ -71,9 +65,17 @@ void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
 //----------------------------------------------
 // Handle the encoder movement
 //----------------------------------------------
-void ScreenManager::HandleEncoderMovement(uint8_t dir)
+void ScreenManager::HandleEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 {
-  
+  scrCurrent->EncoderMovementHandler(dir);
+}
+
+//----------------------------------------------
+// Handle the encoder click
+//----------------------------------------------
+void ScreenManager::HandleEncoderClick()
+{
+  scrCurrent->EncoderClickHandler();
 }
 
 //----------------------------------------------

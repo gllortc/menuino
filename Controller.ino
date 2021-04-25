@@ -2,12 +2,15 @@
 // Library includes
 //------------------------------------------------------------------
 
+#include <EncoderMenuSwitch.h>
 #include "ScreenManager.h" 
 
 // Pin 13 has an LED connected on most Arduino boards.
 #define BOARD_LED 13
 
 ScreenManager manager;
+EncoderMenuSwitch encoder;
+
 
 //------------------------------------------------------------------
 // Arduino main routines
@@ -22,11 +25,13 @@ void setup()
   Serial.begin(9600);
 
   manager.Initialize();
+  encoder.Initialize(ENCODER_PIN_1, ENCODER_PIN_2, ENCODER_PIN_SW);
 }
  
 void loop()
 {
   manager.Dispatch();
+  encoder.Dispatch();
 }
 
 //----------------------------------------------
@@ -38,11 +43,19 @@ void OnClick(uint16_t xpos, uint16_t ypos)
 }
 
 //----------------------------------------------
-// Encoder callback
+// Encoder movement callback
 //----------------------------------------------
-void OnEncoderMoved(uint8_t dir)
+void OnEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 {
-  
+  manager.HandleEncoderMoved(dir);
+}
+
+//----------------------------------------------
+// Encoder click callback
+//----------------------------------------------
+void OnEncoderClick()
+{
+  manager.HandleEncoderClick();
 }
 
 //------------------------------------------------------

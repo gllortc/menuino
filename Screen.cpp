@@ -31,19 +31,23 @@ void Screen::Dispatch(void)
 //----------------------------------------------------------------------------------------------------
 ScrParameters* Screen::ClickHandler(uint8_t objId)
 { 
-  Serial.println("WARN: Handling click in base class!");
   return NULL;
 }
 
 //----------------------------------------------------------------------------------------------------
+// Handle encoder clicks
+//----------------------------------------------------------------------------------------------------
+void Screen::EncoderClickHandler() {}
+
+//----------------------------------------------------------------------------------------------------
 // Handle encoder movements
 //----------------------------------------------------------------------------------------------------
-void Screen::EncoderHandler(uint8_t dir) {}
+void Screen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) {}
 
 //----------------------------------------------------------------------------------------------------
 // Preoare screen parameters to go to another screen
 //----------------------------------------------------------------------------------------------------
-ScrParameters* Screen::GotoScreen(uint8_t scrId, uint16_t addr = 0, uint8_t track = 0, uint8_t inputMode = 0)
+ScrParameters* Screen::GotoScreen(uint8_t scrId, uint16_t addr, uint8_t track, uint8_t inputMode)
 {
   params.gotoScr   = scrId;
   params.trackNum  = track;
@@ -358,6 +362,25 @@ void Screen::ToggleButtonState(uint8_t objId)
       uiObjects[objId].pressed = false;
       break;
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+// Toggle button selection state
+//----------------------------------------------------------------------------------------------------
+void Screen::SelectButton(uint8_t objId)
+{
+  Serial.println("btn sel toggle");
+
+  for (int i = 0; i < UI_MAX_OBJECTS; i++)
+  {
+    if (uiObjects[i].type == UI_OBJTYPE_MENU_BUTTON && uiObjects[i].selected)
+      disp.tft.drawRect(uiObjects[i].x, uiObjects[i].y, uiObjects[i].width, uiObjects[i].height, uiObjects[i].colorUnpressed);
+
+    uiObjects[i].selected = false;
+  }
+
+  uiObjects[objId].selected = true;
+  disp.tft.drawRect(uiObjects[objId].x, uiObjects[objId].y, uiObjects[objId].width, uiObjects[objId].height, COLOR_BTN_SELECTED);
 }
 
 //----------------------------------------------------------------------------------------------------

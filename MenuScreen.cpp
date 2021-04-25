@@ -1,4 +1,4 @@
-#import  <Arduino.h>
+#include <Arduino.h>
 #include "MenuScreen.h"
 #include "InputScreen.h"
 #include "ScreenObjects.h"
@@ -22,28 +22,45 @@ void MenuScreen::Initialize(HwdManager lcdDisplay)
   AddMenuButton(UI_MENU_SETUP,  5, 170, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_MENU_OPT_SETUP);
 }
 
+//----------------------------------------------------------------------------------------------------
+// Screen shown event handler
+//----------------------------------------------------------------------------------------------------
+void MenuScreen::Shown(ScrParameters *params) 
+{
+  selIdx  = -1;
+}
+
 //----------------------------------------------
 // Dispatch encoder movements and update menu
 //----------------------------------------------
-void MenuScreen::EncoderHandler(uint8_t dir)
+void MenuScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir)
 {
-  if (dir == 1)       // Forward
+  switch (dir)
   {
-    selIdx--;
-    if (selIdx < 0) selIdx = MENU_OPTIONS_COUNT - 1;
-    Serial.println("Menu DOWN");
-  }
-  else if (dir == -1) // Backward
-  {
-    selIdx++;
-    if (selIdx >= MENU_OPTIONS_COUNT) selIdx = 0;
-    Serial.println("Menu UP");
+    case EncoderMenuSwitch::ENCODER_UP:
+      selIdx++;
+      if (selIdx >= MENU_OPTIONS_COUNT) selIdx = 0;
+      break;
+
+    case EncoderMenuSwitch::ENCODER_DOWN:
+      selIdx--;
+      if (selIdx < 0) selIdx = MENU_OPTIONS_COUNT - 1;
+      break;
   }
 
-  if (selPrev != selIdx)
+  if (selIdx >= 0)
+    SelectButton(selIdx);
+}
+
+//----------------------------------------------
+// Dispatch encoder clicks
+//----------------------------------------------
+void MenuScreen::EncoderClickHandler() 
+{
+  if (selIdx >= 0)
   {
-    ToggleButtonState(GetUIObject(selPrev));
-    ToggleButtonState(GetUIObject(selIdx));
+    UIObject* obj = GetUIObject(selIdx);
+    if (OnClick) OnClick(obj->x + 1, obj->y + 1);
   }
 }
 

@@ -9,7 +9,7 @@
 #ifndef _MENUSCREEN_H 
 #define _MENUSCREEN_H 
 
-#import  <Arduino.h>
+#include <Arduino.h>
 #include "Screen.h"
 
 #define MENU_OPTIONS_COUNT 3
@@ -21,8 +21,7 @@
 
 class MenuScreen : public Screen
 {
-  uint8_t   selIdx  = 0;  // Selected menu ID
-  uint8_t   selPrev = 0;  // Selected menu ID
+  int selIdx  = -1;  // Selected menu ID
 
 public:
 
@@ -35,8 +34,10 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(HwdManager lcdDisplay);
+  void Shown(ScrParameters *params) override;
   ScrParameters* ClickHandler(uint8_t objId) override;
-  void EncoderHandler(uint8_t dir) override;
+  void EncoderClickHandler() override;
+  void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
   
 };
 

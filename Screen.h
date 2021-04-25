@@ -9,7 +9,7 @@
 #ifndef _SCREEN_H 
 #define _SCREEN_H 
 
-#import  <Arduino.h>
+#include <Arduino.h>
 #include "HwdManager.h" 
 #include "ScreenObjects.h" 
 
@@ -29,6 +29,7 @@
 typedef struct 
 {
   bool            initialized    = false;
+  bool            selected       = false;
   byte            type           = UI_OBJECT_NULL;
   uint16_t        x              = 0;
   uint16_t        y              = 0;
@@ -40,7 +41,7 @@ typedef struct
   uint16_t        colorBorder    = 0x0000;
   uint8_t         bmpWidth       = 0;
   uint8_t         bmpHeight      = 0;
-  unsigned char  *bitmap;
+  unsigned char*  bitmap;
   const char*     caption;
   uint16_t        value          = 0;
 } UIObject;
@@ -52,7 +53,7 @@ class Screen
 
 public:
 
-  HwdManager    disp;
+  HwdManager      disp;
   uint8_t         id;         // Screen ID
   const char*     caption;    // Screen caption
 
@@ -63,21 +64,27 @@ public:
   //----------------------------------------------
   // Constructors
   //----------------------------------------------
-  virtual Screen();
+  Screen();
 
   //----------------------------------------------
   // Methods
   //----------------------------------------------
   virtual void Initialize(HwdManager lcdDisplay, uint8_t scrId, const char* scrCaption);
   virtual void Dispatch();
+
+  // Hardware handlers
+  virtual ScrParameters* ClickHandler(uint8_t objId);
+  virtual void EncoderClickHandler();
+  virtual void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir);
+
+  // Screen managers
   virtual void Show(ScrParameters *params);
   virtual void Shown(ScrParameters *params);
-  virtual ScrParameters* ClickHandler(uint8_t objId);
-  virtual void EncoderHandler(uint8_t dir);
-
+  uint8_t GetScreenClickedObjectID(int x, int y);
   ScrParameters* GotoScreen(uint8_t scrId, uint16_t addr = 0, uint8_t track = 0, uint8_t inputMode = 0);
   UIObject* GetUIObject(uint8_t objId);
-  uint8_t GetScreenClickedObjectID(int x, int y);
+
+  // UI objects managers
   void SetScreenCaption(const char* newCaption);
   void SetObjectCaption(uint8_t objId, char* newCaption);
   
@@ -87,6 +94,7 @@ public:
   void AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, bool pressed);
   void DrawButton(UIObject* obj);
   void ToggleButtonState(uint8_t objIdx);
+  void SelectButton(uint8_t objIdx);
 
   void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption);
   void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap);

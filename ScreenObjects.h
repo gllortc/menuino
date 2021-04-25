@@ -1,6 +1,8 @@
 #ifndef _SCREENOBJECTS_H 
 #define _SCREENOBJECTS_H 
 
+#include <Arduino.h>
+
 // UI null object ID (used for objects and screens)
 #define UI_OBJECT_NULL  99
 
@@ -161,6 +163,7 @@ const uint8_t BMP_STOP[] = {
 
 #define COLOR_BTN_NORMAL                0x0000
 #define COLOR_BTN_PRESSED               0x1AAE
+#define COLOR_BTN_SELECTED              0xF404
 #define COLOR_BTN_TXT                   0xFFFF
 
 #define COLOR_BTN_ERROR_NORMAL          0xD2C8
@@ -182,7 +185,8 @@ const uint8_t BMP_STOP[] = {
 // Static text
 const char LNG_EN_INI_HEADER[]           = "TRAIN CONTROL";
 const char LNG_EN_INI_VERSION[]          = "Running MENUINO UI version 1.1";
-const char LNG_EN_INI_HDW[]              = "> Initializing hardware";
+const char LNG_EN_INI_LCD[]              = "> Initializing screen";
+const char LNG_EN_INI_ENCODER[]          = "> Initializing encoder";
 const char LNG_EN_INI_READY[]            = "> Ready!";
 const char LNG_EN_MENU_HEADER[]          = "MAIN MENU";
 const char LNG_EN_MENU_OPT_SELECT[]      = "Select train";
@@ -216,7 +220,7 @@ const char LNG_EN_SETUP_OPT_TRACK_4[]    = "Track 4";
 const char LNG_EN_SETUP_OPT_DEVICEID[]   = "XPN ID";
 const char LNG_EN_SETUP_OPT_BACK[]       = "Back";
 
-// Screen returning parameters
+// Screen calling parameters
 typedef struct 
 {
   uint8_t  gotoScr   = UI_OBJECT_NULL; // MANDATORY

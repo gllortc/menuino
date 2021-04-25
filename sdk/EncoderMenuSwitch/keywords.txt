@@ -1,0 +1,26 @@
+#######################################
+# Syntax Coloring Map For FastLED
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+EncoderDirection	KEYWORD1
+EncoderMenuSwitch	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+Initialize	   KEYWORD2
+Dispatch	      KEYWORD2
+OnEncoderMoved	KEYWORD2
+OnEncoderClick	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+ENCODER_UP     LITERAL1
+ENCODER_DOWN	LITERAL1
