@@ -44,23 +44,14 @@ void InputScreen::Initialize(HwdManager lcdDisplay)
 //----------------------------------------------------------------------------------------------------
 void InputScreen::Shown(ScrParameters *params) 
 {
-  Serial.print("params.gotoScr: "); Serial.println(params->gotoScr); 
-  Serial.print("params.inputMode: "); Serial.println(params->inputMode); 
-  Serial.print("params.trackNum: "); Serial.println(params->trackNum); 
-  Serial.print("params.address: "); Serial.println(params->address); 
-
   mode       = params->inputMode;
   track      = params->trackNum;
   inputValue = params->address;
-
-  Serial.print("InputVal: "); Serial.println(inputValue);
 
   if (inputValue > 0) 
   {
     itoa(inputValue, txtAddress, 10);
     SetTextBoxText(UI_ADDR_TXTBOX, txtAddress);
-
-    Serial.print("char[] InputVal: "); Serial.println(txtAddress);
   }
 
   switch (mode)
@@ -152,7 +143,7 @@ void InputScreen::DigitPressed(uint8_t objId)
   txtAddress[addPos + 1] = '\0';
   addPos++;
    
-  SetTextBoxText(GetUIObject(UI_ADDR_TXTBOX), txtAddress);
+  SetTextBoxText(UI_ADDR_TXTBOX, txtAddress);
 }
 
 //----------------------------------------------
@@ -168,7 +159,7 @@ void InputScreen::DeleteButtonPressed(uint8_t objId)
   addPos--;
   txtAddress[addPos] = '\0';
    
-  SetTextBoxText(GetUIObject(UI_ADDR_TXTBOX), txtAddress);
+  SetTextBoxText(UI_ADDR_TXTBOX, txtAddress);
 }
 
 //----------------------------------------------

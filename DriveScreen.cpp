@@ -50,11 +50,6 @@ void DriveScreen::Initialize(HwdManager lcdDisplay)
 void DriveScreen::Shown(ScrParameters *params) 
 {
   xpnDeviceID = Screen::GetDeviceID();
-
-  Serial.print("params.gotoScr: "); Serial.println(params->gotoScr); 
-  Serial.print("params.inputMode: "); Serial.println(params->inputMode); 
-  Serial.print("params.trackNum: "); Serial.println(params->trackNum); 
-  Serial.print("params.address: "); Serial.println(params->address); 
   
   switch (params->trackNum)
   {
@@ -152,6 +147,35 @@ ScrParameters* DriveScreen::ClickHandler(uint8_t objId)
     default:
       return NULL;
   }
+}
+
+//----------------------------------------------
+// Dispatch encoder movements and update menu
+//----------------------------------------------
+void DriveScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir)
+{
+  switch (dir)
+  {
+    case EncoderMenuSwitch::ENCODER_UP:
+      if (engine.speed < engine.steps) engine.speed++;
+      break;
+
+    case EncoderMenuSwitch::ENCODER_DOWN:
+      if (engine.speed > 0) engine.speed--;
+      break;
+  }
+
+  SetProgressBarValue(UI_CTRL_PGBAR, engine.speed);
+
+  Serial.println(engine.speed);
+}
+
+//----------------------------------------------
+// Dispatch encoder clicks
+//----------------------------------------------
+void DriveScreen::EncoderClickHandler() 
+{
+
 }
 
 //------------------------------------------------------

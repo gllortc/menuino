@@ -94,11 +94,11 @@ uint8_t Screen::GetScreenClickedObjectID(int x, int y)
 //----------------------------------------------------------------------------------------------------
 void Screen::Show(ScrParameters *params)
 {
-  Serial.println("Showing screen...");
-
+  // Reset the screen
   disp.tft.reset();
   disp.DrawBaseScreen(caption);
 
+  // Draw all UI objects
   for (int i = 0; i < UI_MAX_OBJECTS; ++i)
   {
     if (uiObjects[i].initialized)
@@ -106,20 +106,18 @@ void Screen::Show(ScrParameters *params)
       switch (uiObjects[i].type)
       {
         case UI_OBJTYPE_CHECK_BUTTON: 
-        case UI_OBJTYPE_PUSH_BUTTON:  DrawButton(&uiObjects[i]);      break;
-        case UI_OBJTYPE_MENU_BUTTON:  DrawMenuButton(&uiObjects[i]);  break;
-        case UI_OBJTYPE_TEXTBOX:      DrawTextBox(&uiObjects[i]);     break;
-        case UI_OBJTYPE_PROGRESSBAR:  DrawProgressBar(&uiObjects[i]); break;
-        //case UI_OBJTYPE_BITMAP:       drawBitmap(&uiObjects[i]);    break;
-        case UI_OBJTYPE_TRANSAREA:
-        default:                                                      break;
+        case UI_OBJTYPE_PUSH_BUTTON:  DrawButton(i);      break;
+        case UI_OBJTYPE_MENU_BUTTON:  DrawMenuButton(i);  break;
+        case UI_OBJTYPE_TEXTBOX:      DrawTextBox(i);     break;
+        case UI_OBJTYPE_PROGRESSBAR:  DrawProgressBar(i); break;
+        case UI_OBJTYPE_BITMAP:       DrawBitmap(i);      break;
+        default:                                          break;
       }
     }
   }
 
+  // Raise the shown event in the screen
   Shown(params);
-
-  Serial.println("Screen shown!");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -145,9 +143,9 @@ void Screen::SetScreenCaption(const char* newCaption)
 //----------------------------------------------------------------------------------------------------
 // Change an UI object caption without drawing it
 //----------------------------------------------------------------------------------------------------
-void Screen::SetObjectCaption(uint8_t objId, char* newCaption)
+void Screen::SetObjectCaption(uint8_t id, char* newCaption)
 {
-  uiObjects[objId].caption = newCaption;
+  uiObjects[id].caption = newCaption;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -280,54 +278,54 @@ void Screen::AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, u
 //----------------------------------------------
 // Draw a button object
 //----------------------------------------------
-void Screen::DrawButton(UIObject* obj)
+void Screen::DrawButton(uint8_t id)
 {
    // Draw button background
-   disp.tft.fillRect(obj->x, obj->y, obj->width, obj->height, (obj->pressed ? obj->colorPressed : obj->colorUnpressed));      
+   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
    
-   if (obj->bmpWidth == 0 && obj->bmpHeight == 0)
+   if (uiObjects[id].bmpWidth == 0 && uiObjects[id].bmpHeight == 0)
    {
       // Draw caption
       disp.tft.setTextSize(2);
       disp.tft.setTextColor(COLOR_SCR_TEXT);
-      disp.tft.setCursor(obj->x + ((obj->width - 20) / 2), obj->y + ((obj->height - 13) / 2));
-      disp.tft.print(obj->caption);
+      disp.tft.setCursor(uiObjects[id].x + ((uiObjects[id].width - 20) / 2), uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
+      disp.tft.print(uiObjects[id].caption);
    }
    else
    {
       // Draw bitmap
-      disp.tft.drawBitmap(obj->x + ((obj->width - obj->bmpWidth) / 2), 
-                          obj->y + ((obj->height - obj->bmpHeight) / 2), 
-                          obj->bitmap, obj->bmpWidth, obj->bmpHeight, 0xFFFF);
+      disp.tft.drawBitmap(uiObjects[id].x + ((uiObjects[id].width - uiObjects[id].bmpWidth) / 2), 
+                          uiObjects[id].y + ((uiObjects[id].height - uiObjects[id].bmpHeight) / 2), 
+                          uiObjects[id].bitmap, uiObjects[id].bmpWidth, uiObjects[id].bmpHeight, COLOR_SCR_TEXT);
    }
 }
 
 //----------------------------------------------
 // Draw a menu button object
 //----------------------------------------------
-void Screen::DrawMenuButton(UIObject* obj)
+void Screen::DrawMenuButton(uint8_t id)
 {
    // Draw button background
-   disp.tft.fillRect(obj->x, obj->y, obj->width, obj->height, (obj->pressed ? obj->colorPressed : obj->colorUnpressed));      
+   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
    
-   if (obj->bmpWidth == 0 && obj->bmpHeight == 0)
+   if (uiObjects[id].bmpWidth == 0 && uiObjects[id].bmpHeight == 0)
    {
       // Draw caption
       disp.tft.setTextSize(2);
       disp.tft.setTextColor(COLOR_SCR_TEXT);
-      disp.tft.setCursor(obj->x + 20, obj->y + ((obj->height - 13) / 2));
+      disp.tft.setCursor(uiObjects[id].x + 20, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
    }
    else
    {
       // Draw bitmap
-      disp.tft.drawBitmap(obj->x + 20, 
-                          obj->y + ((obj->height - obj->bmpHeight) / 2), 
-                          obj->bitmap, obj->bmpWidth, obj->bmpHeight, 0xFFFF);
+      disp.tft.drawBitmap(uiObjects[id].x + 20, 
+                          uiObjects[id].y + ((uiObjects[id].height - uiObjects[id].bmpHeight) / 2), 
+                          uiObjects[id].bitmap, uiObjects[id].bmpWidth, uiObjects[id].bmpHeight, COLOR_SCR_TEXT);
 
-      disp.tft.setCursor(obj->x + obj->bmpWidth + 40, obj->y + ((obj->height - 13) / 2));
+      disp.tft.setCursor(uiObjects[id].x + uiObjects[id].bmpWidth + 40, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
    }
 
-   disp.tft.print(obj->caption);
+   disp.tft.print(uiObjects[id].caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -340,8 +338,8 @@ void Screen::ToggleButtonState(uint8_t objId)
     case UI_OBJTYPE_PUSH_BUTTON:
       for (uint8_t i = 0; i <= 1; i++)
       {
-        uiObjects[objId].pressed = !uiObjects[objId].pressed;   
-        DrawButton(&uiObjects[objId]);
+        uiObjects[objId].pressed = !uiObjects[objId].pressed;
+        DrawButton(objId);
         delay(75);
       }
       uiObjects[objId].pressed = false;
@@ -349,14 +347,14 @@ void Screen::ToggleButtonState(uint8_t objId)
 
     case UI_OBJTYPE_CHECK_BUTTON:
       uiObjects[objId].pressed = !uiObjects[objId].pressed;
-      DrawButton(&uiObjects[objId]);
+      DrawButton(objId);
       break;
 
     case UI_OBJTYPE_MENU_BUTTON:
       for (uint8_t i = 0; i <= 1; i++)
       {
         uiObjects[objId].pressed = !uiObjects[objId].pressed;   
-        DrawMenuButton(&uiObjects[objId]);
+        DrawMenuButton(objId);
         delay(75);
       }
       uiObjects[objId].pressed = false;
@@ -406,28 +404,24 @@ void Screen::AddTextBox(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint
 //----------------------------------------------
 // Draw a text box object
 //----------------------------------------------
-void Screen::DrawTextBox(UIObject* obj)
+void Screen::DrawTextBox(uint8_t id)
 {
    // Draw button background
-   disp.tft.fillRect(obj->x, obj->y, obj->width, obj->height, obj->colorUnpressed); 
-   disp.tft.drawRect(obj->x, obj->y, obj->width, obj->height, obj->colorPressed);
+   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
+   disp.tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorPressed);
    disp.tft.setTextColor(COLOR_SCR_TEXT);
    disp.tft.setTextSize(3);
-   disp.tft.setCursor(obj->x + 10, obj->y + 10);
-   disp.tft.print(obj->caption);
-
-   Serial.print("TxtBox printed! Val: "); Serial.println(obj->caption);
+   disp.tft.setCursor(uiObjects[id].x + 10, uiObjects[id].y + 10);
+   disp.tft.print(uiObjects[id].caption);
 }
 
 //----------------------------------------------------------------------------------------------------
 // Sets the text box text
 //----------------------------------------------------------------------------------------------------
-void Screen::SetTextBoxText(UIObject* obj, const char* text)
+void Screen::SetTextBoxText(uint8_t id, const char* text)
 {
-   Serial.print("TxtBox set! Val: "); Serial.println(text);
-  
-   obj->caption = text;
-   DrawTextBox(obj);
+   uiObjects[id].caption = text;
+   DrawTextBox(id);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -455,20 +449,20 @@ void Screen::AddProgressBar(uint8_t id, uint16_t x, uint16_t y, uint16_t width, 
 //----------------------------------------------
 // Draw a progress bar object
 //----------------------------------------------
-void Screen::DrawProgressBar(UIObject* obj)
+void Screen::DrawProgressBar(uint8_t id)
 {
-   disp.tft.fillRect(obj->x, obj->y, obj->width, obj->height, obj->colorUnpressed);                           // 0x3186
-   disp.tft.fillRect(obj->x, obj->y, map(obj->value, 0, 128, 0, obj->width), obj->height, obj->colorPressed); // 0x1AAE 
-   disp.tft.drawRect(obj->x, obj->y, obj->width, obj->height, obj->colorBorder);                              // 0x02B3
+   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed);
+   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, map(uiObjects[id].value, 0, 128, 0, uiObjects[id].width), uiObjects[id].height, uiObjects[id].colorPressed);
+   disp.tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorBorder);
 }
 
 //----------------------------------------------------------------------------------------------------
 // Sets the progress bar value
 //----------------------------------------------------------------------------------------------------
-void Screen::SetProgressBarValue(UIObject* obj, uint16_t value)
+void Screen::SetProgressBarValue(uint8_t id, uint16_t value)
 {
-   obj->value = value;
-   DrawProgressBar(obj);
+   uiObjects[id].value = value;
+   DrawProgressBar(id);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -491,13 +485,12 @@ void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint1
 }
 
 //----------------------------------------------
-// Draw a progress bar object
+// Draw a monochrome bitmap object
 //----------------------------------------------
-void Screen::DrawBitmap(UIObject* obj)
+void Screen::DrawBitmap(uint8_t id)
 {
-   // Train picture
-   disp.tft.fillRect(obj->x, obj->y, obj->width, obj->height, obj->colorUnpressed); 
-   disp.tft.drawBitmap(obj->x, obj->y, obj->bitmap, obj->width, obj->height, 0xFFFFFF);
+   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
+   disp.tft.drawBitmap(uiObjects[id].x, uiObjects[id].y, uiObjects[id].bitmap, uiObjects[id].width, uiObjects[id].height, COLOR_SCR_TEXT);
 }
 
 //----------------------------------------------------------------------------------------------------

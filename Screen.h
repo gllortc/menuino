@@ -18,10 +18,9 @@
 #define UI_OBJTYPE_CHECK_BUTTON 1
 #define UI_OBJTYPE_PUSH_BUTTON  2
 #define UI_OBJTYPE_MENU_BUTTON  3
-#define UI_OBJTYPE_TRANSAREA    4
-#define UI_OBJTYPE_TEXTBOX      5
-#define UI_OBJTYPE_PROGRESSBAR  6
-#define UI_OBJTYPE_BITMAP       7
+#define UI_OBJTYPE_TEXTBOX      4
+#define UI_OBJTYPE_PROGRESSBAR  5
+#define UI_OBJTYPE_BITMAP       6
 
 //----------------------------------------------
 // Struct storing UI object
@@ -92,24 +91,24 @@ public:
   void AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap);
   void AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap, bool pressed);
   void AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, bool pressed);
-  void DrawButton(UIObject* obj);
-  void ToggleButtonState(uint8_t objIdx);
-  void SelectButton(uint8_t objIdx);
+  void DrawButton(uint8_t id);
+  void ToggleButtonState(uint8_t id);
+  void SelectButton(uint8_t id);
 
   void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption);
   void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap);
-  void DrawMenuButton(UIObject* obj);
+  void DrawMenuButton(uint8_t id);
   
   void AddTextBox(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colBackground, uint16_t colBorder, const char* text);
-  void DrawTextBox(UIObject* obj);
-  void SetTextBoxText(UIObject* obj, const char* text);
+  void DrawTextBox(uint8_t id);
+  void SetTextBoxText(uint8_t id, const char* text);
 
   void AddProgressBar(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colBackground, uint16_t colBorder, uint16_t colFill, uint16_t value);
-  void DrawProgressBar(UIObject* obj);
-  void SetProgressBarValue(UIObject* obj, uint16_t value);
+  void DrawProgressBar(uint8_t id);
+  void SetProgressBarValue(uint8_t id, uint16_t value);
 
   void AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t bgColor, const char* fileName);
-  void DrawBitmap(UIObject* obj);
+  void DrawBitmap(uint8_t id);
 
   // Settings management
   static uint16_t GetTrackAddress(uint8_t trackNum);

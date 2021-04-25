@@ -71,7 +71,7 @@ typedef struct
 {
   boolean   loaded  = false;
   uint16_t  address = 3;
-  uint8_t   steps   = PASOS28;
+  uint8_t   steps   = 128;
   uint8_t   speed   = 0;
   uint8_t   direction;
   Functions func;
@@ -103,6 +103,8 @@ public:
   void Dispatch();
   void Shown(ScrParameters *params);
   ScrParameters* ClickHandler(uint8_t objId) override;
+  void EncoderClickHandler() override;
+  void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
 
   // XPN methods
   uint8_t GetCV17AdrHighByte(uint16_t address);
