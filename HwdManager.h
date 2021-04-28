@@ -14,11 +14,20 @@
 #include <MCUFRIEND_kbv.h>
 #include <EncoderMenuSwitch.h>
 #include <TouchScreen.h>
+#include <XpressNet.h>
 
-// Hardware PINs used
+// LCD hardware pins definition
+#define MINPRESSURE     200
+#define MAXPRESSURE     1000
+#define SWAP(a, b) { uint16_t tmp = a; a = b; b = tmp; }
+
+// Encoder hardware pins definition
 #define ENCODER_PIN_1   25
 #define ENCODER_PIN_2   27
 #define ENCODER_PIN_SW  29
+
+// XPN hardware pins definition
+#define XPN_TXRX_PIN    22 // MAX485 pin
 
 //------------------------------------------------------------------
 // Touchscreen management
@@ -40,19 +49,16 @@ class HwdManager
   uint16_t      TS_BOT  = 180;
 
   // Orientation
-  uint8_t       Orientation = 2;    //LANDSCAPE
+  uint8_t       Orientation = 0;    //LANDSCAPE
   
   TouchScreen   ts = TouchScreen(XP, YP, XM, YM, 260);
   TSPoint       tp;
-  
-  #define MINPRESSURE 200
-  #define MAXPRESSURE 1000
-  #define SWAP(a, b) { uint16_t tmp = a; a = b; b = tmp; }
 
 public:
 
-  //EncoderMenuSwitch encoder;
+  EncoderMenuSwitch encoder;
   MCUFRIEND_kbv     tft;
+  XpressNetClass    xpn;
 
   //----------------------------------------------
   // Constructors
@@ -60,14 +66,23 @@ public:
   HwdManager();
 
   //----------------------------------------------
-  // Methods
+  // MENUINO Methods
   //----------------------------------------------
   void Initialize();
   void Dispatch();
+  void CheckTouch();
   void DrawBaseScreen(const char* caption);
   void PrintTextLine(const char *text);
   void PrintErrTextLine(const char *text);
 
+  //----------------------------------------------
+  // APP specific methods
+  //----------------------------------------------
+  // Settings management
+  static uint16_t GetTrackAddress(uint8_t trackNum);
+  static void SetTrackAddress(uint8_t track, uint16_t address);
+  static uint8_t GetDeviceID();
+  static void SetDeviceID(uint8_t id = 25);
 };
 
 //----------------------------------------------

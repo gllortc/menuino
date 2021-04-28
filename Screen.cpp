@@ -1,4 +1,3 @@
-#include <EEPROM.h>
 #include "Screen.h"
 #include "HwdManager.h" 
 #include "ScreenObjects.h" 
@@ -23,13 +22,13 @@ void Screen::Initialize(HwdManager lcdDisplay, uint8_t scrId, const char* scrCap
 //----------------------------------------------------------------------------------------------------
 void Screen::Dispatch(void)
 {
-  disp.Dispatch();
+  disp.CheckTouch();
 }
 
 //----------------------------------------------------------------------------------------------------
 // Handle screen clicks
 //----------------------------------------------------------------------------------------------------
-ScrParameters* Screen::ClickHandler(uint8_t objId)
+ScreenParams* Screen::ClickHandler(uint8_t objId)
 { 
   return NULL;
 }
@@ -47,7 +46,7 @@ void Screen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) {}
 //----------------------------------------------------------------------------------------------------
 // Preoare screen parameters to go to another screen
 //----------------------------------------------------------------------------------------------------
-ScrParameters* Screen::GotoScreen(uint8_t scrId, uint16_t addr, uint8_t track, uint8_t inputMode)
+ScreenParams* Screen::GotoScreen(uint8_t scrId, uint16_t addr, uint8_t track, uint8_t inputMode)
 {
   params.gotoScr   = scrId;
   params.trackNum  = track;
@@ -92,7 +91,7 @@ uint8_t Screen::GetScreenClickedObjectID(int x, int y)
 //----------------------------------------------------------------------------------------------------
 // Paint the screen with its current UI objects states
 //----------------------------------------------------------------------------------------------------
-void Screen::Show(ScrParameters *params)
+void Screen::Show(ScreenParams *params)
 {
   // Reset the screen
   disp.tft.reset();
@@ -124,7 +123,7 @@ void Screen::Show(ScrParameters *params)
 // Virtual method that can be implemented by derived classes 
 // to show information when the screen is shown
 //----------------------------------------------------------------------------------------------------
-void Screen::Shown(ScrParameters *params) {}
+void Screen::Shown(ScreenParams *params) {}
 
 //----------------------------------------------------------------------------------------------------
 // Change the screen caption
@@ -491,39 +490,4 @@ void Screen::DrawBitmap(uint8_t id)
 {
    disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
    disp.tft.drawBitmap(uiObjects[id].x, uiObjects[id].y, uiObjects[id].bitmap, uiObjects[id].width, uiObjects[id].height, COLOR_SCR_TEXT);
-}
-
-//----------------------------------------------------------------------------------------------------
-// App Settings -> Gets the associated digital address from the EEPROM for the specified track number
-//----------------------------------------------------------------------------------------------------
-uint16_t Screen::GetTrackAddress(uint8_t trackNum)
-{
-  return (EEPROM.read(((trackNum - 1) * 2) + 1) << 8) + EEPROM.read(((trackNum - 1) * 2) + 2);
-}
-
-//----------------------------------------------------------------------------------------------------
-// App Settings -> Sets the associated digital address to a track number in the EEPROM
-//----------------------------------------------------------------------------------------------------
-void Screen::SetTrackAddress(uint8_t track, uint16_t address)
-{
-  EEPROM.write(((track - 1) * 2) + 1, highByte(address));
-  EEPROM.write(((track - 1) * 2) + 2, lowByte(address));
-}
-
-//----------------------------------------------------------------------------------------------------
-// App Settings -> Gets the XPN digital ID from the EEPROM (default value: 25)
-//----------------------------------------------------------------------------------------------------
-uint8_t Screen::GetDeviceID()
-{
-  uint8_t xpnDeviceID = EEPROM.read(0);
-  if (xpnDeviceID <= 0 || xpnDeviceID > 31) xpnDeviceID = 25;
-  return xpnDeviceID;
-}
-
-//----------------------------------------------------------------------------------------------------
-// App Settings -> Sets the XPN device ID in the EEPROM
-//----------------------------------------------------------------------------------------------------
-void Screen::SetDeviceID(uint8_t id = 25)
-{
-  EEPROM.write(0, id);
 }

@@ -1,5 +1,5 @@
 //==============================================
-// Application main menu screen
+// Main menu screen
 //----------------------------------------------
 // Author:  Gerard Llort Casanova
 // Version: 1.1
@@ -34,8 +34,8 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(HwdManager lcdDisplay);
-  void Shown(ScrParameters *params) override;
-  ScrParameters* ClickHandler(uint8_t objId) override;
+  void Shown(ScreenParams *params) override;
+  ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderClickHandler() override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
   

@@ -186,6 +186,7 @@ const uint8_t BMP_STOP[] = {
 const char LNG_EN_INI_HEADER[]           = "TRAIN CONTROL";
 const char LNG_EN_INI_VERSION[]          = "Running MENUINO UI version 1.1";
 const char LNG_EN_INI_LCD[]              = "> Initializing screen";
+const char LNG_EN_INI_XPN[]              = "> Initializing XpressNet";
 const char LNG_EN_INI_ENCODER[]          = "> Initializing encoder";
 const char LNG_EN_INI_READY[]            = "> Ready!";
 const char LNG_EN_MENU_HEADER[]          = "MAIN MENU";
@@ -227,6 +228,6 @@ typedef struct
   uint8_t  inputMode = 0;
   uint8_t  trackNum  = 0;              // app defined
   uint16_t address   = 0;              // app defined
-} ScrParameters;
+} ScreenParams;
 
 #endif

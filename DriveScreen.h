@@ -1,5 +1,5 @@
 //==============================================
-// Application main menu screen
+// Engine drive screen
 //----------------------------------------------
 // Author:  Gerard Llort Casanova
 // Version: 1.1
@@ -10,18 +10,15 @@
 #define _DRIVESCREEN_H 
 
 #include <Arduino.h>
-#include <XpressNet.h>
 #include "Screen.h"
 
-#define PASOS14               0 // Speed steps
-#define PASOS28               2
-#define PASOS128              3
+#define SPEED_STEPS_14        0 // Speed steps
+#define SPEED_STEPS_28        2
+#define SPEED_STEPS_128       3
 
 #define FUNC_OFF              0 // Engine function status
 #define FUNC_ON               1
 #define FUNC_CHANGE           2
-
-#define XPN_TXRX_PIN          9 // MAX485 pin
 
 #define UI_CTRL_F0            0
 #define UI_CTRL_F1            1
@@ -87,7 +84,6 @@ class DriveScreen : public Screen
   uint8_t         xpnMasterStatus;
   
   Engine          engine;
-  XpressNetClass  xpn;
 
 public:
 
@@ -100,9 +96,8 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(HwdManager lcdDisplay);
-  void Dispatch();
-  void Shown(ScrParameters *params);
-  ScrParameters* ClickHandler(uint8_t objId) override;
+  void Shown(ScreenParams *params);
+  ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderClickHandler() override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
 

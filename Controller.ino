@@ -3,14 +3,12 @@
 //------------------------------------------------------------------
 
 #include <EncoderMenuSwitch.h>
-#include "ScreenManager.h" 
+#include "Menuino.h" 
 
 // Pin 13 has an LED connected on most Arduino boards.
 #define BOARD_LED 13
 
-ScreenManager manager;
-EncoderMenuSwitch encoder;
-
+Menuino           menuino;
 
 //------------------------------------------------------------------
 // Arduino main routines
@@ -24,14 +22,12 @@ void setup()
 
   Serial.begin(9600);
 
-  manager.Initialize();
-  encoder.Initialize(ENCODER_PIN_1, ENCODER_PIN_2, ENCODER_PIN_SW);
+  menuino.Initialize();
 }
  
 void loop()
 {
-  manager.Dispatch();
-  encoder.Dispatch();
+  menuino.Dispatch();
 }
 
 //----------------------------------------------
@@ -39,7 +35,7 @@ void loop()
 //----------------------------------------------
 void OnClick(uint16_t xpos, uint16_t ypos) 
 {
-  manager.HandleScreenClick(xpos, ypos);
+  menuino.HandleScreenClick(xpos, ypos);
 }
 
 //----------------------------------------------
@@ -47,7 +43,7 @@ void OnClick(uint16_t xpos, uint16_t ypos)
 //----------------------------------------------
 void OnEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 {
-  manager.HandleEncoderMoved(dir);
+  menuino.HandleEncoderMoved(dir);
 }
 
 //----------------------------------------------
@@ -55,7 +51,7 @@ void OnEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 //----------------------------------------------
 void OnEncoderClick()
 {
-  manager.HandleEncoderClick();
+  menuino.HandleEncoderClick();
 }
 
 //------------------------------------------------------
@@ -63,7 +59,7 @@ void OnEncoderClick()
 //------------------------------------------------------
 void notifyXNetPower(uint8_t state) 
 {
-  manager.HandleMasterStatusNotify(state);
+  menuino.HandleMasterStatusNotify(state);
 }
 
 //------------------------------------------------------
@@ -71,7 +67,7 @@ void notifyXNetPower(uint8_t state)
 //------------------------------------------------------
 void notifyLokAll(uint8_t adrHigh, uint8_t adrLow, boolean busy, uint8_t steps, uint8_t speed, uint8_t direction, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean req) 
 {
-  manager.HandleEngineNotify(adrHigh, adrLow, steps, speed, direction, F0, F1, F2, F3);
+  menuino.HandleEngineNotify(adrHigh, adrLow, steps, speed, direction, F0, F1, F2, F3);
 }
 
 //------------------------------------------------------

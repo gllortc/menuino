@@ -47,7 +47,7 @@ typedef struct
 
 class Screen
 {
-  ScrParameters   params;
+  ScreenParams    params;
   UIObject        uiObjects[UI_MAX_OBJECTS];
 
 public:
@@ -72,15 +72,15 @@ public:
   virtual void Dispatch();
 
   // Hardware handlers
-  virtual ScrParameters* ClickHandler(uint8_t objId);
+  virtual ScreenParams* ClickHandler(uint8_t objId);
   virtual void EncoderClickHandler();
   virtual void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir);
 
   // Screen managers
-  virtual void Show(ScrParameters *params);
-  virtual void Shown(ScrParameters *params);
+  virtual void Show(ScreenParams *params);
+  virtual void Shown(ScreenParams *params);
   uint8_t GetScreenClickedObjectID(int x, int y);
-  ScrParameters* GotoScreen(uint8_t scrId, uint16_t addr = 0, uint8_t track = 0, uint8_t inputMode = 0);
+  ScreenParams* GotoScreen(uint8_t scrId, uint16_t addr = 0, uint8_t track = 0, uint8_t inputMode = 0);
   UIObject* GetUIObject(uint8_t objId);
 
   // UI objects managers

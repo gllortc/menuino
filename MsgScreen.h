@@ -29,7 +29,7 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(HwdManager lcdDisplay);
-  ScrParameters* ClickHandler(uint8_t objId) override;
+  ScreenParams* ClickHandler(uint8_t objId) override;
 
 };
 

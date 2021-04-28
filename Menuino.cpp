@@ -1,38 +1,38 @@
 #include <Arduino.h>
 #include "ScreenObjects.h"
-#include "ScreenManager.h"
+#include "Menuino.h"
 
 //----------------------------------------------
 // Constructor
 //----------------------------------------------
-ScreenManager::ScreenManager() {}
+Menuino::Menuino() {}
 
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void ScreenManager::Initialize()
+void Menuino::Initialize()
 {
   // Initialize the display
-  scr.Initialize();
+  hardware.Initialize();
 
   // Initialize the screen parameters
-  params = new ScrParameters();
+  params = new ScreenParams();
 
   // Initialize the screens
   scrMenu = new MenuScreen();
-  scrMenu->Initialize(scr);
+  scrMenu->Initialize(hardware);
 
   scrSelect = new SelectScreen();
-  scrSelect->Initialize(scr);
+  scrSelect->Initialize(hardware);
 
   scrDrive = new DriveScreen();
-  scrDrive->Initialize(scr);
+  scrDrive->Initialize(hardware);
 
   scrInput = new InputScreen();
-  scrInput->Initialize(scr);
+  scrInput->Initialize(hardware);
 
   scrSetup = new SetupScreen();
-  scrSetup->Initialize(scr);
+  scrSetup->Initialize(hardware);
 
   // Show initial screen
   params->gotoScr = SCR_MENU_ID;
@@ -42,21 +42,21 @@ void ScreenManager::Initialize()
 //----------------------------------------------
 // Dispatch encoder movements and update menu
 //----------------------------------------------
-void ScreenManager::Dispatch()
+void Menuino::Dispatch()
 {
-  scr.Dispatch();
-  scrCurrent->Dispatch();
+  hardware.Dispatch();
+  // scrCurrent->Dispatch();
 }
 
 //----------------------------------------------
 // Handle the screen clicks
 //----------------------------------------------
-void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
+void Menuino::HandleScreenClick(uint16_t xpos, uint16_t ypos)
 {
   uint8_t objId = scrCurrent->GetScreenClickedObjectID(xpos, ypos);
   if (objId == UI_OBJECT_NULL) return;
 
-  params = scrCurrent->ClickHandler(objId); //, &params);
+  params = scrCurrent->ClickHandler(objId);
   if (params == NULL) return;
 
   ShowScreen(params);
@@ -65,7 +65,7 @@ void ScreenManager::HandleScreenClick(uint16_t xpos, uint16_t ypos)
 //----------------------------------------------
 // Handle the encoder movement
 //----------------------------------------------
-void ScreenManager::HandleEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
+void Menuino::HandleEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 {
   scrCurrent->EncoderMovementHandler(dir);
 }
@@ -73,7 +73,7 @@ void ScreenManager::HandleEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 //----------------------------------------------
 // Handle the encoder click
 //----------------------------------------------
-void ScreenManager::HandleEncoderClick()
+void Menuino::HandleEncoderClick()
 {
   scrCurrent->EncoderClickHandler();
 }
@@ -81,7 +81,7 @@ void ScreenManager::HandleEncoderClick()
 //----------------------------------------------
 // Handle engine notification received
 //----------------------------------------------
-void ScreenManager::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)
+void Menuino::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)
 {
   // Discard notifications outside the drive screen
   if (scrCurrent->id != SCR_DRIVE_ID) return;
@@ -92,7 +92,7 @@ void ScreenManager::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t 
 //----------------------------------------------
 // Handle central status notifications
 //----------------------------------------------
-void ScreenManager::HandleMasterStatusNotify(uint8_t status)
+void Menuino::HandleMasterStatusNotify(uint8_t status)
 {
   // Discard notifications outside the drive screen
   if (scrCurrent->id != SCR_DRIVE_ID) return;
@@ -103,7 +103,7 @@ void ScreenManager::HandleMasterStatusNotify(uint8_t status)
 //----------------------------------------------
 // Gets the current screen instance
 //----------------------------------------------
-Screen* ScreenManager::GetCurrentScreen()
+Screen* Menuino::GetCurrentScreen()
 {
   return scrCurrent;
 }
@@ -111,7 +111,7 @@ Screen* ScreenManager::GetCurrentScreen()
 //----------------------------------------------
 // Set new current screen
 //----------------------------------------------
-void ScreenManager::ShowScreen(ScrParameters* params)
+void Menuino::ShowScreen(ScreenParams* params)
 {
   switch (params->gotoScr)
   {

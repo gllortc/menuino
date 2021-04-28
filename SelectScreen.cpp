@@ -28,7 +28,7 @@ void SelectScreen::Initialize(HwdManager lcdDisplay)
 // Virtual method that can be implemented by derived classes 
 // to show information when the screen is shown
 //----------------------------------------------------------------------------------------------------
-void SelectScreen::Shown(ScrParameters *params) 
+void SelectScreen::Shown(ScreenParams *params) 
 {
   char sadr[5];
 
@@ -37,7 +37,7 @@ void SelectScreen::Shown(ScrParameters *params)
 
   for (uint8_t i = 0; i < 4; i++)
   {
-    itoa(Screen::GetTrackAddress(i + 1), sadr, 10);
+    itoa(disp.GetTrackAddress(i + 1), sadr, 10);
     disp.tft.setCursor(170, 92 + (i * 45));
     disp.tft.print(sadr);
   }
@@ -54,12 +54,12 @@ void SelectScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection di
   {
     case EncoderMenuSwitch::ENCODER_UP:
       selIdx++;
-      if (selIdx >= MENU_OPTIONS_COUNT) selIdx = 0;
+      if (selIdx >= SELECT_OPTIONS_COUNT) selIdx = 0;
       break;
 
     case EncoderMenuSwitch::ENCODER_DOWN:
       selIdx--;
-      if (selIdx < 0) selIdx = MENU_OPTIONS_COUNT - 1;
+      if (selIdx < 0) selIdx = SELECT_OPTIONS_COUNT - 1;
       break;
   }
 
@@ -82,25 +82,25 @@ void SelectScreen::EncoderClickHandler()
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-ScrParameters* SelectScreen::ClickHandler(uint8_t objId)
+ScreenParams* SelectScreen::ClickHandler(uint8_t objId)
 {
   switch (objId)
   {
     case UI_SELECT_TRACK1: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, Screen::GetTrackAddress(1), 1);
+      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(1), 1);
       
     case UI_SELECT_TRACK2: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, Screen::GetTrackAddress(2), 2);
+      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(2), 2);
       
     case UI_SELECT_TRACK3: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, Screen::GetTrackAddress(3), 3);
+      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(3), 3);
       
     case UI_SELECT_TRACK4: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, Screen::GetTrackAddress(4), 4);
+      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(4), 4);
       
     case UI_SELECT_RETURN: 
       ToggleButtonState(objId);

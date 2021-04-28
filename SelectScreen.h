@@ -12,13 +12,13 @@
 #include <Arduino.h>
 #include "Screen.h"
 
-#define MENU_OPTIONS_COUNT 5
+#define SELECT_OPTIONS_COUNT  5
 
-#define UI_SELECT_TRACK1   0
-#define UI_SELECT_TRACK2   1
-#define UI_SELECT_TRACK3   2
-#define UI_SELECT_TRACK4   3
-#define UI_SELECT_RETURN   4
+#define UI_SELECT_TRACK1      0
+#define UI_SELECT_TRACK2      1
+#define UI_SELECT_TRACK3      2
+#define UI_SELECT_TRACK4      3
+#define UI_SELECT_RETURN      4
 
 class SelectScreen : public Screen
 {
@@ -35,8 +35,8 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(HwdManager lcdDisplay);
-  void Shown(ScrParameters *params) override;
-  ScrParameters* ClickHandler(uint8_t objId) override;
+  void Shown(ScreenParams *params) override;
+  ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
   void EncoderClickHandler() override;
 

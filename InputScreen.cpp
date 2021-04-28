@@ -42,7 +42,7 @@ void InputScreen::Initialize(HwdManager lcdDisplay)
 // Virtual method that can be implemented by derived classes 
 // to show information when the screen is shown
 //----------------------------------------------------------------------------------------------------
-void InputScreen::Shown(ScrParameters *params) 
+void InputScreen::Shown(ScreenParams *params) 
 {
   mode       = params->inputMode;
   track      = params->trackNum;
@@ -87,14 +87,9 @@ void InputScreen::Shown(ScrParameters *params)
 }
 
 //----------------------------------------------
-// Dispatch encoder movements and update menu
-//----------------------------------------------
-// void InputScreen::Dispatch() {}
-
-//----------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------
-ScrParameters* InputScreen::ClickHandler(uint8_t objId)
+ScreenParams* InputScreen::ClickHandler(uint8_t objId)
 {
   switch (objId)
   {
@@ -165,7 +160,7 @@ void InputScreen::DeleteButtonPressed(uint8_t objId)
 //----------------------------------------------
 // Delete button pressed
 //----------------------------------------------
-ScrParameters* InputScreen::OkButtonPressed(uint8_t objId)
+ScreenParams* InputScreen::OkButtonPressed(uint8_t objId)
 {
   uint16_t inputValue = GetInputValue();
 
@@ -177,11 +172,11 @@ ScrParameters* InputScreen::OkButtonPressed(uint8_t objId)
       return GotoScreen(SCR_DRIVE_ID, inputValue);
 
     case INPUT_MODE_TRACK_ADDR:
-      Screen::SetTrackAddress(track, inputValue);
+      disp.SetTrackAddress(track, inputValue);
       return GotoScreen(SCR_SETUP_ID, inputValue);
 
     case INPUT_MODE_DEVID:
-      Screen::SetDeviceID(lowByte(inputValue));
+      disp.SetDeviceID(lowByte(inputValue));
       return GotoScreen(SCR_SETUP_ID, id);
 
     default:

@@ -22,7 +22,7 @@ void MsgScreen::Initialize(HwdManager lcdDisplay)
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-ScrParameters* MsgScreen::ClickHandler(uint8_t objId)
+ScreenParams* MsgScreen::ClickHandler(uint8_t objId)
 {
   switch (objId)
   {

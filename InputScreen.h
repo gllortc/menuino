@@ -53,14 +53,14 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(HwdManager lcdDisplay);
-  ScrParameters* ClickHandler(uint8_t objId) override;
-  void Shown(ScrParameters *params) override;
+  ScreenParams* ClickHandler(uint8_t objId) override;
+  void Shown(ScreenParams *params) override;
 
 private:
 
   void DigitPressed(uint8_t objId);
   void DeleteButtonPressed(uint8_t objId);
-  ScrParameters* OkButtonPressed(uint8_t objId);
+  ScreenParams* OkButtonPressed(uint8_t objId);
   uint16_t GetInputValue();
   void SetAddress(uint16_t addr);
   void ClearAddress();

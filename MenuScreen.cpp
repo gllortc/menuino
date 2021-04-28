@@ -25,7 +25,7 @@ void MenuScreen::Initialize(HwdManager lcdDisplay)
 //----------------------------------------------------------------------------------------------------
 // Screen shown event handler
 //----------------------------------------------------------------------------------------------------
-void MenuScreen::Shown(ScrParameters *params) 
+void MenuScreen::Shown(ScreenParams *params) 
 {
   selIdx  = -1;
 }
@@ -67,7 +67,7 @@ void MenuScreen::EncoderClickHandler()
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-ScrParameters* MenuScreen::ClickHandler(uint8_t objId)
+ScreenParams* MenuScreen::ClickHandler(uint8_t objId)
 {
   switch (objId)
   {

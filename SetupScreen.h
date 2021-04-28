@@ -12,7 +12,7 @@
 #include <Arduino.h>
 #include "Screen.h"
 
-#define MENU_OPTIONS_COUNT  6
+#define SETUP_OPTIONS_COUNT 6
 
 // UI elements ID definition
 #define UI_SETUP_ADR1       0
@@ -37,8 +37,8 @@ public:
   // Methods
   //----------------------------------------------
   void Initialize(HwdManager lcdDisplay);
-  void Shown(ScrParameters *params) override;
-  ScrParameters* ClickHandler(uint8_t objId) override;
+  void Shown(ScreenParams *params) override;
+  ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
   void EncoderClickHandler() override;
   

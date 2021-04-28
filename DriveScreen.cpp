@@ -47,9 +47,9 @@ void DriveScreen::Initialize(HwdManager lcdDisplay)
 // Virtual method that can be implemented by derived classes 
 // to show information when the screen is shown
 //----------------------------------------------------------------------------------------------------
-void DriveScreen::Shown(ScrParameters *params) 
+void DriveScreen::Shown(ScreenParams *params) 
 {
-  xpnDeviceID = Screen::GetDeviceID();
+  xpnDeviceID = disp.GetDeviceID();
   
   switch (params->trackNum)
   {
@@ -74,6 +74,12 @@ void DriveScreen::Shown(ScrParameters *params)
        break;
   }
 
+  // Set current engine
+  engine.address   = params->address;
+  engine.steps     = 128;
+  engine.speed     = 0;
+  engine.direction = 0;
+
   disp.tft.setTextSize(1);
 
   char id[2];
@@ -85,25 +91,13 @@ void DriveScreen::Shown(ScrParameters *params)
   disp.tft.print(LNG_EN_DRIVE_ADR);
   disp.tft.setTextSize(3);
   disp.tft.setCursor(18, 100);
-  disp.tft.print(params->address);
-
-  // Start XPN communications
-  xpn.start(xpnDeviceID, XPN_TXRX_PIN); // Start XPN
-  xpn.getPower();                       // Get CS status
-}
-
-//----------------------------------------------
-// Dispatch encoder movements and update menu
-//----------------------------------------------
-void DriveScreen::Dispatch()
-{
-  xpn.receive();
+  disp.tft.print(engine.address);
 }
 
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-ScrParameters* DriveScreen::ClickHandler(uint8_t objId)
+ScreenParams* DriveScreen::ClickHandler(uint8_t objId)
 {
   switch (objId)
   {
@@ -166,8 +160,6 @@ void DriveScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir
   }
 
   SetProgressBarValue(UI_CTRL_PGBAR, engine.speed);
-
-  Serial.println(engine.speed);
 }
 
 //----------------------------------------------
@@ -203,7 +195,7 @@ void DriveScreen::GetEngineInfo()
 //  pideInfoLoco       = false;
 //  pedirFuncPendiente = true;
 
-  xpn.getLocoInfo(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
+  disp.xpn.getLocoInfo(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
 }
 
 //------------------------------------------------------
@@ -213,7 +205,7 @@ void DriveScreen::GetEngineFuncs()
 {
 //  pideInfoFunc = false;
 
-  xpn.getLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
+  disp.xpn.getLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
 }
 
 //------------------------------------------------------
@@ -223,9 +215,9 @@ uint8_t DriveScreen::GetSpeedMax(uint8_t steps)
 {
   switch (steps) 
   { 
-    case PASOS14:   return 14;
-    case PASOS28:   return 28;
-    case PASOS128:  return 126;
+    case SPEED_STEPS_14:  return 14;
+    case SPEED_STEPS_28:  return 28;
+    case SPEED_STEPS_128: return 126;
   }
 }
 
@@ -240,15 +232,15 @@ void DriveScreen::SetEngineSpeed(uint8_t speed)
   // nos saltamos el paso de parada de emergencia
   switch (engine.steps) 
   { 
-    case PASOS14:
-    case PASOS128:
+    case SPEED_STEPS_14:
+    case SPEED_STEPS_128:
       if (speed > 0) 
         velocidad = speed + 1;
       else           
         velocidad = 0;
       break;
 
-    case PASOS28:               // ponemos los 28 pasos en su formato
+    case SPEED_STEPS_28:        // ponemos los 28 pasos en su formato
       if (speed > 0)            // pasamos velocidad entre 0 y 31 (0 0 0 S4 S3 S2 S1 S0)
         velocidad = speed + 3;  // nos saltamos pasos parada de emergencia
       else
@@ -261,7 +253,7 @@ void DriveScreen::SetEngineSpeed(uint8_t speed)
   if (engine.direction) // añade el sentido
     velocidad |= 0x80;
     
-  xpn.setLocoDrive(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), engine.steps, velocidad);
+  disp.xpn.setLocoDrive(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), engine.steps, velocidad);
 }
 
 //------------------------------------------------------
@@ -271,12 +263,12 @@ void DriveScreen::ToggleEngineFunction(uint8_t funcNum)
 {
   if (bitRead(engine.func.Bits, funcNum)) 
   {
-    xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_OFF, funcNum);
+    disp.xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_OFF, funcNum);
     bitClear(engine.func.Bits, funcNum);
   } 
   else 
   {
-    xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_ON, funcNum);
+    disp.xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_ON, funcNum);
     bitSet(engine.func.Bits, funcNum);
   }
 }
@@ -294,11 +286,11 @@ void DriveScreen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t st
   // ajusta mi Velocidad segun los pasos
   switch (steps) 
   { 
-    case PASOS14:
-    case PASOS128:
+    case SPEED_STEPS_14:
+    case SPEED_STEPS_128:
       engine.speed = speed - 1;               // remove the emergency stop step
       break;
-    case PASOS28:                             // Mover bits a su sitio (0 0 0 S0 S4 S3 S2 S1)
+    case SPEED_STEPS_28:                      // Mover bits a su sitio (0 0 0 S0 S4 S3 S2 S1)
       speed <<= 1;                            // Hacemos sitio para el bit (0 0 S0 S4 S3 S2 S1 0 )
       bitWrite(speed, 0, bitRead(speed, 5));  // colocamos bit (0 0 S0 S4 S3 S2 S1 S0)
       speed &= 0x1F;                          // Limpiamos (0 0 0 S4 S3 S2 S1 S0);

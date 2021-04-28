@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 #include <EncoderMenuSwitch.h>
 #include "ScreenObjects.h"
 #include "HwdManager.h"
@@ -14,9 +15,11 @@ HwdManager::HwdManager() {}
 void HwdManager::Initialize()
 {
   uint16_t ID;
-  // uint16_t tmp;
-   
+
+  //-----------------------------
   // Screen initialization
+  //-----------------------------
+  
   ID = tft.readID();
    
   // Screen equivalences
@@ -32,27 +35,42 @@ void HwdManager::Initialize()
 
   PrintTextLine(LNG_EN_INI_VERSION);
   delay(1500);
-  PrintTextLine(LNG_EN_INI_LCD);
-  delay(200);
   
+  PrintTextLine(LNG_EN_INI_LCD);
+  delay(200);  
    
   // Touchscreen initialization
   // switch (Orientation) // adjust for different aspects
   // {      
       // case 0:   break;        //no change,  calibrated for PORTRAIT
       // case 1:   tmp = TS_LEFT, TS_LEFT = TS_BOT, TS_BOT = TS_RT, TS_RT = TS_TOP, TS_TOP = tmp;  break;
-      // case 2:   SWAP(TS_LEFT, TS_RT);  SWAP(TS_TOP, TS_BOT); break;
+      // case 2:   
+      SWAP(TS_LEFT, TS_RT);  SWAP(TS_TOP, TS_BOT); // break;
       // case 3:   tmp = TS_LEFT, TS_LEFT = TS_TOP, TS_TOP = TS_RT, TS_RT = TS_BOT, TS_BOT = tmp;  break;
   // }
   ts = TouchScreen(XP, YP, XM, YM, 260);     // call the constructor AGAIN with new values.
 
+  //-----------------------------
+  // Encoder initialization
+  //-----------------------------
+
   PrintTextLine(LNG_EN_INI_ENCODER);
   delay(200);
 
-  //encoder.Initialize(ENCODER_PIN_1, ENCODER_PIN_2, ENCODER_PIN_SW);
+  encoder.Initialize(ENCODER_PIN_1, ENCODER_PIN_2, ENCODER_PIN_SW);
+
+  //-----------------------------
+  // XpressNet initialization
+  //-----------------------------
+
+  PrintTextLine(LNG_EN_INI_XPN);
+  delay(200);
+
+  xpn.start(GetDeviceID(), XPN_TXRX_PIN); // Start XPN
+  xpn.getPower();                         // Get CS status
 
   PrintTextLine(LNG_EN_INI_READY);
-  delay(200);  
+  delay(500);
 }
 
 //----------------------------------------------
@@ -60,19 +78,16 @@ void HwdManager::Initialize()
 //----------------------------------------------
 void HwdManager::Dispatch()
 {
-  uint8_t  idx = -1;
-  uint16_t xpos;       //screen coordinates
-  uint16_t ypos;
+  xpn.receive();      // XPN dispatcher
+  encoder.Dispatch(); // Encoder dispatcher
+  CheckTouch();       // Touchscreen dispatcher
+}
 
-  //============================
-  // Encoder dispatcher
-  //----------------------------
-  //encoder.Dispatch();
-  //============================
-
-  //============================
-  // Touchscreen click dispatcher
-  //----------------------------
+//----------------------------------------------
+// Check for touchscreen press
+//----------------------------------------------
+void HwdManager::CheckTouch()
+{
   tp = ts.getPoint();  // tp.x, tp.y are ADC values
 
   // if sharing pins, you'll need to fix the directions of the touchscreen pins
@@ -80,24 +95,25 @@ void HwdManager::Dispatch()
   pinMode(YP, OUTPUT);
   pinMode(XP, OUTPUT);
   pinMode(YM, OUTPUT);
-   
-  if (!(tp.z > MINPRESSURE && tp.z < MAXPRESSURE)) return 99;
 
-  // Avoid read multiple pressed
-  delay(100);
-   
-  // is controller wired for Landscape ? or are we oriented in Landscape?
-  if (SwapXY != (Orientation & 1)) SWAP(tp.x, tp.y);
-   
-  // scale from 0->1023 to tft.width  i.e. left = 0, rt = width
-  // most mcufriend have touch (with icons) that extends below the TFT
-  // screens without icons need to reserve a space for "erase"
-  // scale the ADC values from ts.getPoint() to screen values e.g. 0-239
-  xpos = map(tp.x, TS_LEFT, TS_RT, tft.width(), 0);
-  ypos = map(tp.y, TS_TOP, TS_BOT, tft.height(), 0);
+  if (tp.z > MINPRESSURE && tp.z < MAXPRESSURE)
+  {
+    delay(100);
+    
+    // is controller wired for Landscape ? or are we oriented in Landscape?
+    if (SwapXY != (Orientation & 1)) SWAP(tp.x, tp.y);
+    
+    if (OnClick) 
+    {
+      // scale from 0->1023 to tft.width  i.e. left = 0, rt = width
+      // most mcufriend have touch (with icons) that extends below the TFT
+      // screens without icons need to reserve a space for "erase"
+      // scale the ADC values from ts.getPoint() to screen values e.g. 0-239
 
-  if (OnClick) OnClick(xpos, ypos);
-  //============================
+      OnClick(map(tp.x, TS_LEFT, TS_RT,  tft.width(),  0), 
+              map(tp.y, TS_TOP,  TS_BOT, tft.height(), 0));
+    }
+  }
 }
 
 //----------------------------------------------
@@ -138,4 +154,39 @@ void HwdManager::PrintErrTextLine(const char *text)
 {
    tft.setTextColor(COLOR_SCR_ERROR_TEXT);
    tft.println(text);
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Gets the associated digital address from the EEPROM for the specified track number
+//----------------------------------------------------------------------------------------------------
+uint16_t HwdManager::GetTrackAddress(uint8_t trackNum)
+{
+  return (EEPROM.read(((trackNum - 1) * 2) + 1) << 8) + EEPROM.read(((trackNum - 1) * 2) + 2);
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Sets the associated digital address to a track number in the EEPROM
+//----------------------------------------------------------------------------------------------------
+void HwdManager::SetTrackAddress(uint8_t track, uint16_t address)
+{
+  EEPROM.write(((track - 1) * 2) + 1, highByte(address));
+  EEPROM.write(((track - 1) * 2) + 2, lowByte(address));
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Gets the XPN digital ID from the EEPROM (default value: 25)
+//----------------------------------------------------------------------------------------------------
+uint8_t HwdManager::GetDeviceID()
+{
+  uint8_t devId = EEPROM.read(0);
+  if (devId <= 0 || devId > 31) devId = 25;
+  return devId;
+}
+
+//----------------------------------------------------------------------------------------------------
+// App Settings -> Sets the XPN device ID in the EEPROM
+//----------------------------------------------------------------------------------------------------
+void HwdManager::SetDeviceID(uint8_t id)
+{
+  EEPROM.write(0, id);
 }
