@@ -27,7 +27,7 @@
 #define ENCODER_PIN_SW  29
 
 // XPN hardware pins definition
-#define XPN_TXRX_PIN    22 // MAX485 pin
+#define XPN_TXRX_PIN    31 // MAX485 pin
 
 //------------------------------------------------------------------
 // Touchscreen management
@@ -50,9 +50,12 @@ class HwdManager
 
   // Orientation
   uint8_t       Orientation = 0;    //LANDSCAPE
-  
+
   TouchScreen   ts = TouchScreen(XP, YP, XM, YM, 260);
   TSPoint       tp;
+
+  // XPN internal variables
+  uint8_t       xpnMasterStatus = csTrackVoltageOff;
 
 public:
 
@@ -71,13 +74,19 @@ public:
   void Initialize();
   void Dispatch();
   void CheckTouch();
-  void DrawBaseScreen(const char* caption);
+  void DrawBaseScreen(const char* caption, bool resetNotifyBar = false);
+  void DrawNotifyIcon(uint8_t index, uint16_t color, const unsigned char *bitmap);
   void PrintTextLine(const char *text);
   void PrintErrTextLine(const char *text);
 
   //----------------------------------------------
   // APP specific methods
   //----------------------------------------------
+  
+  // XPN management
+  void SetXPNStatus(uint8_t status);
+  uint8_t GetXPNStatus();
+  
   // Settings management
   static uint16_t GetTrackAddress(uint8_t trackNum);
   static void SetTrackAddress(uint8_t track, uint16_t address);

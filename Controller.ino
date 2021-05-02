@@ -5,7 +5,7 @@
 #include <EncoderMenuSwitch.h>
 #include "Menuino.h" 
 
-// Pin 13 has an LED connected on most Arduino boards.
+// On board LED in
 #define BOARD_LED 13
 
 Menuino           menuino;

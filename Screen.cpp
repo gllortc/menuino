@@ -30,7 +30,9 @@ void Screen::Dispatch(void)
 //----------------------------------------------------------------------------------------------------
 ScreenParams* Screen::ClickHandler(uint8_t objId)
 { 
-  return NULL;
+  // Toggle push buttons
+  if (uiObjects[objId].type == UI_OBJTYPE_PUSH_BUTTON || uiObjects[objId].type == UI_OBJTYPE_MENU_BUTTON)
+    ToggleButtonState(objId);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -42,6 +44,42 @@ void Screen::EncoderClickHandler() {}
 // Handle encoder movements
 //----------------------------------------------------------------------------------------------------
 void Screen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) {}
+
+//----------------------------------------------------------------------------------------------------
+// Handle central station (XPN) status notifications
+//----------------------------------------------------------------------------------------------------
+void Screen::XpnMasterStatusNotifyHandler(uint8_t state) 
+{
+  disp.SetXPNStatus(state);
+  
+  switch (state) 
+  {
+    case csNormal:
+      disp.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_ON);
+      break;
+
+    case csShortCircuit: // Corto circuito - OFF
+      disp.DrawNotifyIcon(0, COLOR_NAVBAR_ERROR, BMP_XPN_SHORT);
+      break;
+    
+    case csTrackVoltageOff: // Sin tension en via - OFF
+      disp.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
+      break;
+
+    case csEmergencyStop: // Parada emergencia - StoP
+      disp.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
+      break;
+
+    case csServiceMode: // Programacion en modo servicio - Pro
+      disp.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_SERVICE);
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+// Handle engine notifications
+//----------------------------------------------------------------------------------------------------
+void Screen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3) {}
 
 //----------------------------------------------------------------------------------------------------
 // Preoare screen parameters to go to another screen
@@ -170,7 +208,7 @@ void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, u
 //----------------------------------------------------------------------------------------------------
 // Add a check button to the current screen
 //----------------------------------------------------------------------------------------------------
-void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap)
+void Screen::AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, const unsigned char *bitmap)
 {
   if (!uiObjects[id].initialized)
   {
@@ -212,7 +250,7 @@ void Screen::AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, 
 //----------------------------------------------------------------------------------------------------
 // Add a state button to the current screen
 //----------------------------------------------------------------------------------------------------
-void Screen::AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap, bool pressed)
+void Screen::AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, const unsigned char *bitmap, bool pressed)
 {
    if (!uiObjects[id].initialized)
    {
@@ -254,7 +292,7 @@ void Screen::AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, u
 //----------------------------------------------------------------------------------------------------
 // Adds a menu button to the current screen. Text and image caption
 //----------------------------------------------------------------------------------------------------
-void Screen::AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap)
+void Screen::AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, uint16_t bmpWidth, uint16_t bmpHeight, const unsigned char *bitmap)
 {
    if (!uiObjects[id].initialized)
    {
@@ -330,34 +368,47 @@ void Screen::DrawMenuButton(uint8_t id)
 //----------------------------------------------------------------------------------------------------
 // Toggle push button state and returns to the unpressed position
 //----------------------------------------------------------------------------------------------------
-void Screen::ToggleButtonState(uint8_t objId)
+void Screen::ToggleButtonState(uint8_t id)
 {
-  switch (uiObjects[objId].type)
+  switch (uiObjects[id].type)
   {
     case UI_OBJTYPE_PUSH_BUTTON:
       for (uint8_t i = 0; i <= 1; i++)
       {
-        uiObjects[objId].pressed = !uiObjects[objId].pressed;
-        DrawButton(objId);
+        uiObjects[id].pressed = !uiObjects[id].pressed;
+        DrawButton(id);
         delay(75);
       }
-      uiObjects[objId].pressed = false;
+      uiObjects[id].pressed = false;
       break;
 
     case UI_OBJTYPE_CHECK_BUTTON:
-      uiObjects[objId].pressed = !uiObjects[objId].pressed;
-      DrawButton(objId);
+      uiObjects[id].pressed = !uiObjects[id].pressed;
+      DrawButton(id);
       break;
 
     case UI_OBJTYPE_MENU_BUTTON:
       for (uint8_t i = 0; i <= 1; i++)
       {
-        uiObjects[objId].pressed = !uiObjects[objId].pressed;   
-        DrawMenuButton(objId);
+        uiObjects[id].pressed = !uiObjects[id].pressed;   
+        DrawMenuButton(id);
         delay(75);
       }
-      uiObjects[objId].pressed = false;
+      uiObjects[id].pressed = false;
       break;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+// Set the state for the specified check button
+// NOTE: For any other type of object the invokation will be cancelled
+//----------------------------------------------------------------------------------------------------
+void Screen::SetButtonState(uint8_t id, bool state)
+{
+  if (uiObjects[id].type == UI_OBJTYPE_CHECK_BUTTON && uiObjects[id].pressed != state)
+  {
+    uiObjects[id].pressed = state;
+    DrawButton(id);
   }
 }
 
@@ -366,8 +417,6 @@ void Screen::ToggleButtonState(uint8_t objId)
 //----------------------------------------------------------------------------------------------------
 void Screen::SelectButton(uint8_t objId)
 {
-  Serial.println("btn sel toggle");
-
   for (int i = 0; i < UI_MAX_OBJECTS; i++)
   {
     if (uiObjects[i].type == UI_OBJTYPE_MENU_BUTTON && uiObjects[i].selected)
@@ -467,7 +516,7 @@ void Screen::SetProgressBarValue(uint8_t id, uint16_t value)
 //----------------------------------------------------------------------------------------------------
 // Add a check button to the current screen
 //----------------------------------------------------------------------------------------------------
-void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t bgColor, const char* fileName)
+void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color, const char* fileName)
 {
    if (!uiObjects[id].initialized)
    {
@@ -478,7 +527,7 @@ void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint1
       uiObjects[id].width          = width;
       uiObjects[id].height         = height;
       uiObjects[id].pressed        = false;
-      uiObjects[id].colorUnpressed = bgColor;
+      uiObjects[id].colorUnpressed = color;
       uiObjects[id].caption        = fileName;
    }
 }

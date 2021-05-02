@@ -83,10 +83,7 @@ void Menuino::HandleEncoderClick()
 //----------------------------------------------
 void Menuino::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)
 {
-  // Discard notifications outside the drive screen
-  if (scrCurrent->id != SCR_DRIVE_ID) return;
-
-  ((DriveScreen*)scrCurrent)->HandleEngineNotify(adrHigh, adrLow, steps, speed, dir, F0, F1, F2, F3);
+  scrCurrent->HandleEngineNotify(adrHigh, adrLow, steps, speed, dir, F0, F1, F2, F3);
 }
 
 //----------------------------------------------
@@ -94,10 +91,7 @@ void Menuino::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps,
 //----------------------------------------------
 void Menuino::HandleMasterStatusNotify(uint8_t status)
 {
-  // Discard notifications outside the drive screen
-  if (scrCurrent->id != SCR_DRIVE_ID) return;
-
-  ((DriveScreen*)scrCurrent)->HandleMasterStatusNotify(status);
+  scrCurrent->XpnMasterStatusNotifyHandler(status);
 }
 
 //----------------------------------------------
@@ -135,8 +129,8 @@ void Menuino::ShowScreen(ScreenParams* params)
       scrCurrent->Show(params);
       break;
 
-    case SCR_MESSAGE_ID:
-      scrCurrent = scrMessage;
+    case SCR_WAIT_ID:
+      scrCurrent = scrWait;
       scrCurrent->Show(params);
       break;
 

@@ -31,7 +31,8 @@ void HwdManager::Initialize()
   // if (tft.height() > tft.width()) 
   tft.setRotation(Orientation);
    
-  DrawBaseScreen(LNG_EN_INI_HEADER);
+  DrawBaseScreen(LNG_EN_INI_HEADER, true);
+  DrawNotifyIcon(0, COLOR_NAVBAR_DISABLED, BMP_XPN_OFF);
 
   PrintTextLine(LNG_EN_INI_VERSION);
   delay(1500);
@@ -119,14 +120,16 @@ void HwdManager::CheckTouch()
 //----------------------------------------------
 // Paint a blank screen with caption
 //----------------------------------------------
-void HwdManager::DrawBaseScreen(const char* caption)
+void HwdManager::DrawBaseScreen(const char* caption, bool resetNotifyBar)
 {
-  tft.fillScreen(COLOR_SCR_BACKGROUND);
-  tft.fillRect(0, 0,  240, 20, COLOR_NAVBAR_BACKGROUND);
-  tft.fillRect(0, 21, 240, 50, COLOR_SCR_CAPTION_BACKGROUND);  
+  if (resetNotifyBar)
+    tft.fillRect(0, 0, tft.width(), 20, COLOR_NAVBAR_BACKGROUND);
 
-  tft.drawBitmap(220, 2, BMP_XPN_OFF, 18, 18, COLOR_NAVBAR_DISABLED);
-  tft.drawBitmap(10, 35, BMP_MENU,    24, 24, 0xFFFF);
+  tft.fillRect(0, 21, tft.width(), 50, COLOR_SCR_CAPTION_BACKGROUND);         // screen caption
+  tft.fillRect(0, 72, tft.width(), tft.height() - 72, COLOR_SCR_BACKGROUND);  // screen area
+
+  //tft.drawBitmap(220, 2, BMP_XPN_OFF, 18, 18, COLOR_NAVBAR_DISABLED);
+  tft.drawBitmap(10, 35, BMP_MENU,    24, 24, COLOR_SCR_TEXT);
    
   tft.setTextColor(COLOR_SCR_TEXT);
   tft.setTextSize(2);                 
@@ -136,6 +139,19 @@ void HwdManager::DrawBaseScreen(const char* caption)
   // Set default cursor position and text size at begining to the scr
   tft.setTextSize(1);      
   tft.setCursor(1, 85);
+}
+
+//----------------------------------------------
+// Draw/update a notification icon
+// Icons fixed sixe: 18x18px
+//----------------------------------------------
+void HwdManager::DrawNotifyIcon(uint8_t index, uint16_t color, const unsigned char *bitmap)
+{
+  // Remove previous icon
+  tft.fillRect(tft.width() - ((index + 1) * 20), 0, 20, 20, COLOR_NAVBAR_BACKGROUND);
+
+  // Draw/update the icon
+  tft.drawBitmap(tft.width() - ((index + 1) * 20), 0, bitmap, 18, 18, color);
 }
 
 //----------------------------------------------
@@ -154,6 +170,22 @@ void HwdManager::PrintErrTextLine(const char *text)
 {
    tft.setTextColor(COLOR_SCR_ERROR_TEXT);
    tft.println(text);
+}
+
+//----------------------------------------------------------------------------------------------------
+// XPN: Store the central station status
+//----------------------------------------------------------------------------------------------------
+void HwdManager::SetXPNStatus(uint8_t status)
+{
+  xpnMasterStatus = status;
+}
+
+//----------------------------------------------------------------------------------------------------
+// XPN: Gets the central station status
+//----------------------------------------------------------------------------------------------------
+uint8_t HwdManager::GetXPNStatus()
+{
+  return xpnMasterStatus;
 }
 
 //----------------------------------------------------------------------------------------------------

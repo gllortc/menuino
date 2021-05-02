@@ -95,7 +95,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager lcdDisplay);
+  void Initialize(HwdManager hardware);
   void Shown(ScreenParams *params);
   ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderClickHandler() override;
@@ -110,8 +110,7 @@ public:
   void SetEngineSpeed(uint8_t speed);
   void ToggleEngineFunction(uint8_t funcNum);
 
-  void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
-  void HandleMasterStatusNotify(uint8_t status);
+  void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3) override;
   
 };
 

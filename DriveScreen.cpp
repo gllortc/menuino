@@ -11,9 +11,9 @@ DriveScreen::DriveScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void DriveScreen::Initialize(HwdManager lcdDisplay)
+void DriveScreen::Initialize(HwdManager hardware)
 {
-  disp    = lcdDisplay;
+  disp    = hardware;
   id      = SCR_DRIVE_ID;
   caption = "";
 
@@ -74,12 +74,15 @@ void DriveScreen::Shown(ScreenParams *params)
        break;
   }
 
-  // Set current engine
+  // Get selected engine information
   engine.address   = params->address;
-  engine.steps     = 128;
+  engine.steps     = 28;
   engine.speed     = 0;
   engine.direction = 0;
+  GetEngineInfo();
+  GetEngineFuncs();
 
+  // Update screen engine info
   disp.tft.setTextSize(1);
 
   char id[2];
@@ -106,13 +109,42 @@ ScreenParams* DriveScreen::ClickHandler(uint8_t objId)
       return GotoScreen(SCR_MENU_ID);
       
     case UI_CTRL_F0: 
+      ToggleEngineFunction(0);
+      ToggleButtonState(objId);
+      break;
+      
     case UI_CTRL_F1: 
+      ToggleEngineFunction(1);
+      ToggleButtonState(objId);
+      break;
+      
     case UI_CTRL_F2: 
+      ToggleEngineFunction(2);
+      ToggleButtonState(objId);
+      break;
+      
     case UI_CTRL_F3: 
+      ToggleEngineFunction(3);
+      ToggleButtonState(objId);
+      break;
+      
     case UI_CTRL_F4: 
+      ToggleEngineFunction(4);
+      ToggleButtonState(objId);
+      break;
+      
     case UI_CTRL_F5: 
-    case UI_CTRL_F6: 
-    case UI_CTRL_F7: 
+      ToggleEngineFunction(5);
+      ToggleButtonState(objId);
+      break;
+      
+    case UI_CTRL_F6:
+      ToggleEngineFunction(6);
+      ToggleButtonState(objId);
+      break;
+      
+    case UI_CTRL_F7:
+      ToggleEngineFunction(7);
       ToggleButtonState(objId);
       break;
 
@@ -148,6 +180,13 @@ ScreenParams* DriveScreen::ClickHandler(uint8_t objId)
 //----------------------------------------------
 void DriveScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir)
 {
+  Serial.print("Status: "); Serial.println(disp.GetXPNStatus());
+  
+  if (disp.GetXPNStatus() != csNormal)
+    return;
+
+  Serial.println("Encoder moved");
+
   switch (dir)
   {
     case EncoderMenuSwitch::ENCODER_UP:
@@ -159,7 +198,8 @@ void DriveScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir
       break;
   }
 
-  SetProgressBarValue(UI_CTRL_PGBAR, engine.speed);
+  // SetProgressBarValue(UI_CTRL_PGBAR, engine.speed);
+  SetEngineSpeed(engine.speed);
 }
 
 //----------------------------------------------
@@ -167,7 +207,77 @@ void DriveScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir
 //----------------------------------------------
 void DriveScreen::EncoderClickHandler() 
 {
+  // TODO: What to do on an encoder click?
+}
 
+//----------------------------------------------
+// Handle CS engine notifications
+//----------------------------------------------
+void DriveScreen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)
+{
+  // Check if engine address is the controlled engine
+  uint16_t engineAdr = ((adrHigh << 8) & 0x3F) + adrLow;
+
+  if (engineAdr != engine.address) 
+    return;
+
+  engine.direction = dir;
+  engine.steps     = steps;
+
+  Serial.print("Adr:  "); Serial.println(engineAdr);
+  Serial.print("Dir:  "); Serial.println(dir);
+  Serial.print("Steps:"); Serial.println(GetSpeedMax(steps));
+
+  // ajusta mi Velocidad segun los pasos
+  switch (steps) 
+  { 
+    case SPEED_STEPS_14:
+    case SPEED_STEPS_128:
+      engine.speed = speed - 1;               // remove the emergency stop step
+      break;
+    case SPEED_STEPS_28:                      // Mover bits a su sitio (0 0 0 S0 S4 S3 S2 S1)
+      speed <<= 1;                            // Hacemos sitio para el bit (0 0 S0 S4 S3 S2 S1 0 )
+      bitWrite(speed, 0, bitRead(speed, 5));  // colocamos bit (0 0 S0 S4 S3 S2 S1 S0)
+      speed &= 0x1F;                          // Limpiamos (0 0 0 S4 S3 S2 S1 S0);
+      engine.speed = speed - 3;               // remove the emergency stop step
+      break;
+  }
+
+  if (engine.speed > 127) 
+    engine.speed = 0;
+
+  engine.func.Xpress[3] = F3;               // F3: F28 F27 F26 F25 F24 F23 F22 F21
+  engine.func.Xpress[2] = F2;               // F2: F20 F19 F18 F17 F16 F15 F14 F13
+  engine.func.Xpress[1] = F1;               // F1: F12 F11 F10 F9 F8 F7 F6 F5
+  engine.func.Xpress[0] = F0 << 4;          // F0: F4 F3 F2 F1 0 0 0 0
+    
+  if (bitRead(F0, 4))                       // ponemos F0: x x x F0 F4 F3 F2 F1 asi F4 F3 F2 F1 F0 x x x para reordenarlos
+    bitSet(engine.func.Xpress[0], 3);       // F4 F3 F2 F1 F0 0 0 0
+
+  engine.func.Bits = engine.func.Bits >> 3; // desplazamos los 29 bits a su sitio: 000F28F27...F0
+
+  // Update the progress bar value
+  SetProgressBarValue(UI_CTRL_PGBAR, engine.speed);
+
+  // Update direction button states
+  SetButtonState(UI_CTRL_DIR_FWD, dir);
+  SetButtonState(UI_CTRL_DIR_REV, !dir);
+
+  // Update function button states
+  SetButtonState(UI_CTRL_F0, bitRead(engine.func.Bits, 0));
+  SetButtonState(UI_CTRL_F1, bitRead(engine.func.Bits, 1));
+  SetButtonState(UI_CTRL_F2, bitRead(engine.func.Bits, 2));
+  SetButtonState(UI_CTRL_F3, bitRead(engine.func.Bits, 3));
+  SetButtonState(UI_CTRL_F4, bitRead(engine.func.Bits, 4));
+  SetButtonState(UI_CTRL_F5, bitRead(engine.func.Bits, 5));
+  SetButtonState(UI_CTRL_F6, bitRead(engine.func.Bits, 6));
+  SetButtonState(UI_CTRL_F7, bitRead(engine.func.Bits, 7));
+
+  Serial.print("Speed:"); Serial.println(engine.speed);
+  Serial.print("F0:"); Serial.println(bitRead(engine.func.Bits, 0));
+  Serial.print("F1:"); Serial.println(bitRead(engine.func.Bits, 1));
+  Serial.print("F2:"); Serial.println(bitRead(engine.func.Bits, 2));
+  Serial.print("F3:"); Serial.println(bitRead(engine.func.Bits, 3));
 }
 
 //------------------------------------------------------
@@ -254,10 +364,13 @@ void DriveScreen::SetEngineSpeed(uint8_t speed)
     velocidad |= 0x80;
     
   disp.xpn.setLocoDrive(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), engine.steps, velocidad);
+
+  Serial.print("Engine speed: "); Serial.println(speed);
 }
 
 //------------------------------------------------------
 // Sets function status
+// F0:bit 0, F1:bit 1, etc.
 //------------------------------------------------------
 void DriveScreen::ToggleEngineFunction(uint8_t funcNum)
 {
@@ -270,84 +383,5 @@ void DriveScreen::ToggleEngineFunction(uint8_t funcNum)
   {
     disp.xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_ON, funcNum);
     bitSet(engine.func.Bits, funcNum);
-  }
-}
-
-void DriveScreen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)
-{
-  // Check if engine address is the controlled engine
-  uint16_t engineAdr = ((adrHigh << 8) & 0x3F) + adrLow;
-  if (engineAdr != engine.address) 
-    return;
-
-  engine.direction = dir;
-  engine.steps     = steps;
-
-  // ajusta mi Velocidad segun los pasos
-  switch (steps) 
-  { 
-    case SPEED_STEPS_14:
-    case SPEED_STEPS_128:
-      engine.speed = speed - 1;               // remove the emergency stop step
-      break;
-    case SPEED_STEPS_28:                      // Mover bits a su sitio (0 0 0 S0 S4 S3 S2 S1)
-      speed <<= 1;                            // Hacemos sitio para el bit (0 0 S0 S4 S3 S2 S1 0 )
-      bitWrite(speed, 0, bitRead(speed, 5));  // colocamos bit (0 0 S0 S4 S3 S2 S1 S0)
-      speed &= 0x1F;                          // Limpiamos (0 0 0 S4 S3 S2 S1 S0);
-      engine.speed = speed - 3;               // remove the emergency stop step
-      break;
-  }
-
-  if (engine.speed > 127) 
-    engine.speed = 0;
-
-  engine.func.Xpress[3] = F3;               // F3: F28 F27 F26 F25 F24 F23 F22 F21
-  engine.func.Xpress[2] = F2;               // F2: F20 F19 F18 F17 F16 F15 F14 F13
-  engine.func.Xpress[1] = F1;               // F1: F12 F11 F10 F9 F8 F7 F6 F5
-  engine.func.Xpress[0] = F0 << 4;          // F0: F4 F3 F2 F1 0 0 0 0
-    
-  if (bitRead(F0, 4))                       // ponemos F0: x x x F0 F4 F3 F2 F1 asi F4 F3 F2 F1 F0 x x x para reordenarlos
-    bitSet(engine.func.Xpress[0], 3);       // F4 F3 F2 F1 F0 0 0 0
-
-  engine.func.Bits = engine.func.Bits >> 3; // desplazamos los 29 bits a su sitio: 000F28F27...F0
-}
-//----------------------------------------------
-// Handle central status notifications
-//----------------------------------------------
-void DriveScreen::HandleMasterStatusNotify(uint8_t status)
-{
-  xpnMasterStatus = status;
-  
-  switch (xpnMasterStatus) 
-  {
-    case csNormal: // Al entrar en modo normal mostramos la direccion de nuestra locomotora
-//      miModo = NORMAL; // pedimos informacion de la locomotora por si ha cambiado
-//      mostrarNumero(miLocomotora, 4);
-//      encoderMax = GetSpeedMax(engine.steps);
-//      encoderValor = engine.speed;
-//      pideInfoLoco = true;
-      break;
-    case csShortCircuit: // Corto circuito - OFF
-    case csTrackVoltageOff: // Sin tension en via - OFF
-//      digitos[MILES] = 0;
-//      digitos[CENTENAS] = CH_F;
-//      digitos[DECENAS] = CH_F;
-//      digitos[UNIDADES] = CH_ESPACIO;
-//      miModo = ERROR_XN;
-      break;
-    case csEmergencyStop: // Parada emergencia - StoP
-//      digitos[MILES] = 5;
-//      digitos[CENTENAS] = CH_t;
-//      digitos[DECENAS] = CH_o;
-//      digitos[UNIDADES] = CH_P;
-//      miModo = ERROR_XN;
-      break;
-    case csServiceMode: // Programacion en modo servicio - Pro
-//      digitos[MILES] = CH_P;
-//      digitos[CENTENAS] = CH_r;
-//      digitos[DECENAS] = CH_o;
-//      digitos[UNIDADES] = CH_ESPACIO;
-//      miModo = ERROR_XN;
-      break;
   }
 }

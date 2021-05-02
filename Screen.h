@@ -27,22 +27,22 @@
 //----------------------------------------------
 typedef struct 
 {
-  bool            initialized    = false;
-  bool            selected       = false;
-  byte            type           = UI_OBJECT_NULL;
-  uint16_t        x              = 0;
-  uint16_t        y              = 0;
-  uint8_t         width          = 0;
-  uint8_t         height         = 0;
-  bool            pressed        = false;
-  uint16_t        colorPressed   = 0x0000;
-  uint16_t        colorUnpressed = 0x0000;
-  uint16_t        colorBorder    = 0x0000;
-  uint8_t         bmpWidth       = 0;
-  uint8_t         bmpHeight      = 0;
-  unsigned char*  bitmap;
-  const char*     caption;
-  uint16_t        value          = 0;
+  bool                  initialized    = false;
+  bool                  selected       = false;
+  byte                  type           = UI_OBJECT_NULL;
+  uint16_t              x              = 0;
+  uint16_t              y              = 0;
+  uint8_t               width          = 0;
+  uint8_t               height         = 0;
+  bool                  pressed        = false;
+  uint16_t              colorPressed   = 0x0000;
+  uint16_t              colorUnpressed = 0x0000;
+  uint16_t              colorBorder    = 0x0000;
+  uint8_t               bmpWidth       = 0;
+  uint8_t               bmpHeight      = 0;
+  const unsigned char*  bitmap;
+  const char*           caption;
+  uint16_t              value          = 0;
 } UIObject;
 
 class Screen
@@ -75,6 +75,8 @@ public:
   virtual ScreenParams* ClickHandler(uint8_t objId);
   virtual void EncoderClickHandler();
   virtual void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir);
+  virtual void XpnMasterStatusNotifyHandler(uint8_t state);
+  virtual void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
 
   // Screen managers
   virtual void Show(ScreenParams *params);
@@ -88,15 +90,16 @@ public:
   void SetObjectCaption(uint8_t objId, char* newCaption);
   
   void AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption);
-  void AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap);
-  void AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap, bool pressed);
+  void AddPushButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, const unsigned char *bitmap);
+  void AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, uint16_t bmpWidth, uint16_t bmpHeight, const unsigned char *bitmap, bool pressed);
   void AddStateButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, bool pressed);
   void DrawButton(uint8_t id);
   void ToggleButtonState(uint8_t id);
+  void SetButtonState(uint8_t id, bool state);
   void SelectButton(uint8_t id);
 
   void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption);
-  void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, uint16_t bmpWidth, uint16_t bmpHeight, unsigned char *bitmap);
+  void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, uint16_t bmpWidth, uint16_t bmpHeight, const unsigned char *bitmap);
   void DrawMenuButton(uint8_t id);
   
   void AddTextBox(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colBackground, uint16_t colBorder, const char* text);
@@ -107,7 +110,7 @@ public:
   void DrawProgressBar(uint8_t id);
   void SetProgressBarValue(uint8_t id, uint16_t value);
 
-  void AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t bgColor, const char* fileName);
+  void AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color, const char* fileName);
   void DrawBitmap(uint8_t id);
 
   // Settings management

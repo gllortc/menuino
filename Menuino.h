@@ -15,7 +15,7 @@
 #include "SelectScreen.h" 
 #include "DriveScreen.h" 
 #include "InputScreen.h" 
-#include "MsgScreen.h" 
+#include "WaitScreen.h" 
 #include "SetupScreen.h" 
 
 class Menuino 
@@ -27,7 +27,7 @@ class Menuino
   SelectScreen*  scrSelect;
   DriveScreen*   scrDrive;
   InputScreen*   scrInput;
-  MsgScreen*     scrMessage;
+  WaitScreen*    scrWait;
   SetupScreen*   scrSetup;
 
   ScreenParams* params;

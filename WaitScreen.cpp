@@ -1,36 +1,37 @@
 #include <Arduino.h>
-#include "MsgScreen.h"
+#include "WaitScreen.h"
 #include "ScreenObjects.h"
 
 //----------------------------------------------
 // Constructor
 //----------------------------------------------
-MsgScreen::MsgScreen() {}
+WaitScreen::WaitScreen() {}
 
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void MsgScreen::Initialize(HwdManager lcdDisplay)
+void WaitScreen::Initialize(HwdManager hardware)
 {
-  disp    = lcdDisplay;
-  id      = SCR_MESSAGE_ID;
-  caption = "INFO";
+  disp    = hardware;
+  id      = SCR_WAIT_ID;
+  caption = "WAIT";
 
-  AddPushButton(UI_MSG_OK, 80, 280, 80, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "OK");
+  AddBitmap(UI_WAIT_BMP, (hardware.tft.width() - 36) / 2, (hardware.tft.height() - 36) / 2, 36, 36, COLOR_NAVBAR_WARNING, BMP_WAIT);
+  AddPushButton(UI_WAIT_CANCEL, (hardware.tft.width() - 80) / 2, ((hardware.tft.height() - 36) / 2) + 60, 80, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Cancel");
 }
 
 //----------------------------------------------------------------------------------------------------
 // Hadle screen clicks
 //----------------------------------------------------------------------------------------------------
-ScreenParams* MsgScreen::ClickHandler(uint8_t objId)
+ScreenParams* WaitScreen::ClickHandler(uint8_t objId)
 {
+  Screen::ClickHandler(objId);
+
   switch (objId)
   {
-    case UI_MSG_OK:
-      ToggleButtonState(objId);
+    case UI_WAIT_CANCEL:
       return GotoScreen(SCR_MENU_ID);
-
-    default:
-      return NULL;
   }
+
+  return NULL;
 }
