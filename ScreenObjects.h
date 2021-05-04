@@ -13,6 +13,7 @@
 #define SCR_ADDRESS_ID  4
 #define SCR_WAIT_ID     5
 #define SCR_SETUP_ID    6
+#define SCR_INFO_ID     7
 
 //---------------------------------------------------------
 // Icons used outside the classes
@@ -229,13 +230,14 @@ const char LNG_EN_MENU_HEADER[]          = "MAIN MENU";
 const char LNG_EN_MENU_OPT_SELECT[]      = "Select train";
 const char LNG_EN_MENU_OPT_DRIVE[]       = "Manual drive";
 const char LNG_EN_MENU_OPT_SETUP[]       = "Settings";
+const char LNG_EN_MENU_OPT_INFO[]        = "Information";
 const char LNG_EN_DRIVE_HEADER_MANUAL[]  = "MANUAL DRIVE";
 const char LNG_EN_DRIVE_HEADER_TRACK_1[] = "TRACK 1";
 const char LNG_EN_DRIVE_HEADER_TRACK_2[] = "TRACK 2";
 const char LNG_EN_DRIVE_HEADER_TRACK_3[] = "TRACK 3";
 const char LNG_EN_DRIVE_HEADER_TRACK_4[] = "TRACK 4";
 const char LNG_EN_DRIVE_ADR[]            = "ADDRESS";
-const char LNG_EN_DRIVE_DEVICEID[]       = "XPN #";
+const char LNG_EN_DRIVE_DEVICEID[]       = "XPN #%02d";
 const char LNG_EN_INPUT_HEADER[]         = "INPUT VALUE";
 const char LNG_EN_INPUT_HEADER_MANUAL[]  = "SET ENGINE ADR";
 const char LNG_EN_INPUT_HEADER_TRACK_1[] = "SET TRACK 1 ADR";

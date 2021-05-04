@@ -11,9 +11,9 @@ SelectScreen::SelectScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void SelectScreen::Initialize(HwdManager lcdDisplay)
+void SelectScreen::Initialize(HwdManager *hardware)
 {
-  disp    = lcdDisplay;
+  hdw     = hardware;
   id      = SCR_SELECT_ID;
   caption = LNG_EN_SELECT_HEADER;
 
@@ -32,14 +32,14 @@ void SelectScreen::Shown(ScreenParams *params)
 {
   char sadr[5];
 
-  disp.tft.setTextSize(2);
-  disp.tft.setTextColor(COLOR_SCR_TEXT);
+  hdw->tft.setTextSize(2);
+  hdw->tft.setTextColor(COLOR_SCR_TEXT);
 
   for (uint8_t i = 0; i < 4; i++)
   {
-    itoa(disp.GetTrackAddress(i + 1), sadr, 10);
-    disp.tft.setCursor(170, 92 + (i * 45));
-    disp.tft.print(sadr);
+    itoa(hdw->GetTrackAddress(i + 1), sadr, 10);
+    hdw->tft.setCursor(170, 92 + (i * 45));
+    hdw->tft.print(sadr);
   }
 
   selIdx = -1;
@@ -88,19 +88,19 @@ ScreenParams* SelectScreen::ClickHandler(uint8_t objId)
   {
     case UI_SELECT_TRACK1: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(1), 1);
+      return GotoScreen(SCR_DRIVE_ID, hdw->GetTrackAddress(1), 1);
       
     case UI_SELECT_TRACK2: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(2), 2);
+      return GotoScreen(SCR_DRIVE_ID, hdw->GetTrackAddress(2), 2);
       
     case UI_SELECT_TRACK3: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(3), 3);
+      return GotoScreen(SCR_DRIVE_ID, hdw->GetTrackAddress(3), 3);
       
     case UI_SELECT_TRACK4: 
       ToggleButtonState(objId);
-      return GotoScreen(SCR_DRIVE_ID, disp.GetTrackAddress(4), 4);
+      return GotoScreen(SCR_DRIVE_ID, hdw->GetTrackAddress(4), 4);
       
     case UI_SELECT_RETURN: 
       ToggleButtonState(objId);

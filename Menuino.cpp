@@ -20,19 +20,22 @@ void Menuino::Initialize()
 
   // Initialize the screens
   scrMenu = new MenuScreen();
-  scrMenu->Initialize(hardware);
+  scrMenu->Initialize(&hardware);
 
   scrSelect = new SelectScreen();
-  scrSelect->Initialize(hardware);
+  scrSelect->Initialize(&hardware);
 
   scrDrive = new DriveScreen();
-  scrDrive->Initialize(hardware);
+  scrDrive->Initialize(&hardware);
 
   scrInput = new InputScreen();
-  scrInput->Initialize(hardware);
+  scrInput->Initialize(&hardware);
 
   scrSetup = new SetupScreen();
-  scrSetup->Initialize(hardware);
+  scrSetup->Initialize(&hardware);
+
+  scrInfo = new InfoScreen();
+  scrInfo->Initialize(&hardware);
 
   // Show initial screen
   params->gotoScr = SCR_MENU_ID;
@@ -91,7 +94,40 @@ void Menuino::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps,
 //----------------------------------------------
 void Menuino::HandleMasterStatusNotify(uint8_t status)
 {
-  scrCurrent->XpnMasterStatusNotifyHandler(status);
+  hardware.xpnMaster.status = status;
+  
+  switch (hardware.xpnMaster.status) 
+  {
+    case csNormal:
+      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_ON);
+      break;
+
+    case csShortCircuit: // Corto circuito - OFF
+      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_ERROR, BMP_XPN_SHORT);
+      break;
+    
+    case csTrackVoltageOff: // Sin tension en via - OFF
+      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
+      break;
+
+    case csEmergencyStop: // Parada emergencia - StoP
+      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
+      break;
+
+    case csServiceMode: // Programacion en modo servicio - Pro
+      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_SERVICE);
+      break;
+  }
+}
+
+//----------------------------------------------
+// Handle central status information
+//----------------------------------------------
+void Menuino::HandleXPNInfo(uint8_t ver, uint8_t hdwtype)
+{
+  hardware.xpnMaster.vermajor = ver >> 4;
+  hardware.xpnMaster.verminor = (ver && 0xF0);
+  hardware.xpnMaster.type     = hdwtype;
 }
 
 //----------------------------------------------
@@ -136,6 +172,11 @@ void Menuino::ShowScreen(ScreenParams* params)
 
     case SCR_SETUP_ID:
       scrCurrent = scrSetup;
+      scrCurrent->Show(params);
+      break;
+
+    case SCR_INFO_ID:
+      scrCurrent = scrInfo;
       scrCurrent->Show(params);
       break;
   }

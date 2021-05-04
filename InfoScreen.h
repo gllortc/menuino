@@ -1,47 +1,44 @@
 //==============================================
-// Application main menu screen
+// Wait screen implementation
+//----------------------------------------------
+// Input parameters:
+// - gotoScr:   Return screen ID in case of cancellation
+// - inputMode: 0 = With cancel button
+//              1 = Without cancel button
 //----------------------------------------------
 // Author:  Gerard Llort Casanova
 // Version: 1.1
 // Copyright (c) 2021
 //==============================================
 
-#ifndef _SETUPSCREEN_H 
-#define _SETUPSCREEN_H 
+#ifndef _INFOSCREEN_H 
+#define _INFOSCREEN_H
 
 #include <Arduino.h>
 #include "Screen.h"
 
-#define SETUP_OPTIONS_COUNT 6
-
 // UI elements ID definition
-#define UI_SETUP_ADR1       0
-#define UI_SETUP_ADR2       1
-#define UI_SETUP_ADR3       2
-#define UI_SETUP_ADR4       3
-#define UI_SETUP_DEVID      4
-#define UI_SETUP_RETURN     5
+#define UI_INFO_BACK  0
 
-class SetupScreen : public Screen
+class InfoScreen : public Screen
 {
-  uint8_t selIdx = -1;   // Selected menu ID
+
+  uint8_t   cancelScrId;
 
 public:
 
   //----------------------------------------------
   // Constructors
   //----------------------------------------------
-  SetupScreen();
+  InfoScreen();
 
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager *hardware);
+  void Initialize(HwdManager* hardware);
   void Shown(ScreenParams *params) override;
   ScreenParams* ClickHandler(uint8_t objId) override;
-  void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
-  void EncoderClickHandler() override;
-  
+
 };
 
 #endif

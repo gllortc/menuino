@@ -67,11 +67,11 @@ void HwdManager::Initialize()
   PrintTextLine(LNG_EN_INI_XPN);
   delay(200);
 
-  xpn.start(GetDeviceID(), XPN_TXRX_PIN); // Start XPN
-  xpn.getPower();                         // Get CS status
+  xpnMaster.devId = GetDeviceID();
+  xpn.start(xpnMaster.devId, XPN_TXRX_PIN);  // Start XPN
 
-  PrintTextLine(LNG_EN_INI_READY);
-  delay(500);
+  //PrintTextLine(LNG_EN_INI_READY);
+  //delay(500);
 }
 
 //----------------------------------------------
@@ -155,6 +155,22 @@ void HwdManager::DrawNotifyIcon(uint8_t index, uint16_t color, const unsigned ch
 }
 
 //----------------------------------------------
+// Draw/update a notification icon
+// Icons fixed sixe: 18x18px
+//----------------------------------------------
+void HwdManager::PrintNotifyText(const char *text, uint16_t color)
+{
+  // Remove previous text
+  tft.fillRect(0, 0, tft.width() / 2, 20, COLOR_NAVBAR_BACKGROUND);
+
+  // Print the text
+  tft.setTextSize(1);
+  tft.setTextColor(color);
+  tft.setCursor(4, 8);
+  tft.print(text);
+}
+
+//----------------------------------------------
 // Print a text line in the screen
 //----------------------------------------------
 void HwdManager::PrintTextLine(const char *text)
@@ -172,21 +188,21 @@ void HwdManager::PrintErrTextLine(const char *text)
    tft.println(text);
 }
 
-//----------------------------------------------------------------------------------------------------
-// XPN: Store the central station status
-//----------------------------------------------------------------------------------------------------
-void HwdManager::SetXPNStatus(uint8_t status)
-{
-  xpnMasterStatus = status;
-}
-
-//----------------------------------------------------------------------------------------------------
-// XPN: Gets the central station status
-//----------------------------------------------------------------------------------------------------
-uint8_t HwdManager::GetXPNStatus()
-{
-  return xpnMasterStatus;
-}
+////----------------------------------------------------------------------------------------------------
+//// XPN: Store the central station status
+////----------------------------------------------------------------------------------------------------
+//void HwdManager::SetXPNStatus(uint8_t status)
+//{
+//  xpnMaster.status = status;
+//}
+//
+////----------------------------------------------------------------------------------------------------
+//// XPN: Gets the central station status
+////----------------------------------------------------------------------------------------------------
+//uint8_t HwdManager::GetXPNStatus()
+//{
+//  return xpnMaster.status;
+//}
 
 //----------------------------------------------------------------------------------------------------
 // App Settings -> Gets the associated digital address from the EEPROM for the specified track number

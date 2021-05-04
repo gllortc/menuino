@@ -11,9 +11,9 @@ DriveScreen::DriveScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void DriveScreen::Initialize(HwdManager hardware)
+void DriveScreen::Initialize(HwdManager *hardware)
 {
-  disp    = hardware;
+  hdw     = hardware;
   id      = SCR_DRIVE_ID;
   caption = "";
 
@@ -49,8 +49,14 @@ void DriveScreen::Initialize(HwdManager hardware)
 //----------------------------------------------------------------------------------------------------
 void DriveScreen::Shown(ScreenParams *params) 
 {
-  xpnDeviceID = disp.GetDeviceID();
+  hdw->xpnMaster.devId = hdw->GetDeviceID();
   
+  // Show XPN device ID
+  char buffer[11];
+  sprintf(buffer, LNG_EN_DRIVE_DEVICEID, hdw->xpnMaster.devId);
+  hdw->PrintNotifyText(buffer);
+
+  // Show screen caption
   switch (params->trackNum)
   {
     case 1:
@@ -82,19 +88,13 @@ void DriveScreen::Shown(ScreenParams *params)
   GetEngineInfo();
   GetEngineFuncs();
 
-  // Update screen engine info
-  disp.tft.setTextSize(1);
-
-  char id[2];
-  disp.tft.setCursor(4, 8);
-  disp.tft.print(LNG_EN_DRIVE_DEVICEID);
-  disp.tft.print(itoa(xpnDeviceID, id, 10));
-  
-  disp.tft.setCursor(18, 85);
-  disp.tft.print(LNG_EN_DRIVE_ADR);
-  disp.tft.setTextSize(3);
-  disp.tft.setCursor(18, 100);
-  disp.tft.print(engine.address);
+  // Update engine information
+  hdw->tft.setTextSize(1);
+  hdw->tft.setCursor(18, 85);
+  hdw->tft.print(LNG_EN_DRIVE_ADR);
+  hdw->tft.setTextSize(3);
+  hdw->tft.setCursor(18, 100);
+  hdw->tft.print(engine.address);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -110,48 +110,42 @@ ScreenParams* DriveScreen::ClickHandler(uint8_t objId)
       
     case UI_CTRL_F0: 
       ToggleEngineFunction(0);
-      ToggleButtonState(objId);
       break;
       
     case UI_CTRL_F1: 
       ToggleEngineFunction(1);
-      ToggleButtonState(objId);
       break;
       
     case UI_CTRL_F2: 
       ToggleEngineFunction(2);
-      ToggleButtonState(objId);
       break;
       
     case UI_CTRL_F3: 
       ToggleEngineFunction(3);
-      ToggleButtonState(objId);
       break;
       
     case UI_CTRL_F4: 
       ToggleEngineFunction(4);
-      ToggleButtonState(objId);
       break;
       
     case UI_CTRL_F5: 
       ToggleEngineFunction(5);
-      ToggleButtonState(objId);
       break;
       
     case UI_CTRL_F6:
       ToggleEngineFunction(6);
-      ToggleButtonState(objId);
       break;
       
     case UI_CTRL_F7:
       ToggleEngineFunction(7);
-      ToggleButtonState(objId);
       break;
 
-    case UI_CTRL_DIR_REV: 
-    case UI_CTRL_DIR_FWD: 
-      ToggleButtonState(UI_CTRL_DIR_FWD);
-      ToggleButtonState(UI_CTRL_DIR_REV);
+    case UI_CTRL_DIR_REV:
+      SetEngineDirection(1);
+      break;
+    
+    case UI_CTRL_DIR_FWD:
+      SetEngineDirection(0);
       break;
 
     case UI_CTRL_STOP:
@@ -180,12 +174,10 @@ ScreenParams* DriveScreen::ClickHandler(uint8_t objId)
 //----------------------------------------------
 void DriveScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir)
 {
-  Serial.print("Status: "); Serial.println(disp.GetXPNStatus());
+  Serial.print("Status: "); Serial.println(hdw->xpnMaster.status);
   
-  if (disp.GetXPNStatus() != csNormal)
+  if (hdw->xpnMaster.status != csNormal)
     return;
-
-  Serial.println("Encoder moved");
 
   switch (dir)
   {
@@ -197,6 +189,8 @@ void DriveScreen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir
       if (engine.speed > 0) engine.speed--;
       break;
   }
+
+  Serial.print("Speed req: "); Serial.println(engine.speed);
 
   // SetProgressBarValue(UI_CTRL_PGBAR, engine.speed);
   SetEngineSpeed(engine.speed);
@@ -305,7 +299,7 @@ void DriveScreen::GetEngineInfo()
 //  pideInfoLoco       = false;
 //  pedirFuncPendiente = true;
 
-  disp.xpn.getLocoInfo(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
+  hdw->xpn.getLocoInfo(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
 }
 
 //------------------------------------------------------
@@ -315,7 +309,7 @@ void DriveScreen::GetEngineFuncs()
 {
 //  pideInfoFunc = false;
 
-  disp.xpn.getLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
+  hdw->xpn.getLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address));
 }
 
 //------------------------------------------------------
@@ -329,6 +323,22 @@ uint8_t DriveScreen::GetSpeedMax(uint8_t steps)
     case SPEED_STEPS_28:  return 28;
     case SPEED_STEPS_128: return 126;
   }
+}
+
+//------------------------------------------------------
+// Set direction only if the engine is stopped,
+// otherwise stops the engine
+//------------------------------------------------------
+void DriveScreen::SetEngineDirection(uint8_t direction)
+{
+  // change the direction only if the engine is stopped
+  if (engine.speed == 0) 
+    engine.direction = direction;   
+
+  Serial.print("Ch dir->"); Serial.println(direction);
+
+  // stop the engine
+  SetEngineSpeed(0);                
 }
 
 //------------------------------------------------------
@@ -363,7 +373,7 @@ void DriveScreen::SetEngineSpeed(uint8_t speed)
   if (engine.direction) // añade el sentido
     velocidad |= 0x80;
     
-  disp.xpn.setLocoDrive(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), engine.steps, velocidad);
+  hdw->xpn.setLocoDrive(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), engine.steps, velocidad);
 
   Serial.print("Engine speed: "); Serial.println(speed);
 }
@@ -376,12 +386,12 @@ void DriveScreen::ToggleEngineFunction(uint8_t funcNum)
 {
   if (bitRead(engine.func.Bits, funcNum)) 
   {
-    disp.xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_OFF, funcNum);
+    hdw->xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_OFF, funcNum);
     bitClear(engine.func.Bits, funcNum);
   } 
   else 
   {
-    disp.xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_ON, funcNum);
+    hdw->xpn.setLocoFunc(GetCV17AdrHighByte(engine.address), GetCV18AdrLowByte(engine.address), FUNC_ON, funcNum);
     bitSet(engine.func.Bits, funcNum);
   }
 }

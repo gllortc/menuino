@@ -11,9 +11,9 @@ SetupScreen::SetupScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void SetupScreen::Initialize(HwdManager lcdDisplay)
+void SetupScreen::Initialize(HwdManager *hardware)
 {
-  disp    = lcdDisplay;
+  hdw     = hardware;
   id      = SCR_SETUP_ID;
   caption = LNG_EN_SETUP_HEADER;
 
@@ -33,19 +33,19 @@ void SetupScreen::Shown(ScreenParams *params)
 {
   char sadr[5];
 
-  disp.tft.setTextSize(2);
-  disp.tft.setTextColor(COLOR_SCR_TEXT);
+  hdw->tft.setTextSize(2);
+  hdw->tft.setTextColor(COLOR_SCR_TEXT);
 
   for (uint8_t i = 0; i < 4; i++)
   {
-    itoa(disp.GetTrackAddress(i + 1), sadr, 10);
-    disp.tft.setCursor(170, 92 + (i * 45));
-    disp.tft.print(sadr);
+    itoa(hdw->GetTrackAddress(i + 1), sadr, 10);
+    hdw->tft.setCursor(170, 92 + (i * 45));
+    hdw->tft.print(sadr);
   }
 
-  itoa(disp.GetDeviceID(), sadr, 10);
-  disp.tft.setCursor(170, 272);
-  disp.tft.print(sadr);
+  itoa(hdw->GetDeviceID(), sadr, 10);
+  hdw->tft.setCursor(170, 272);
+  hdw->tft.print(sadr);
 
   selIdx = -1;
 }
@@ -93,23 +93,23 @@ ScreenParams* SetupScreen::ClickHandler(uint8_t objId)
   {
     case UI_SETUP_DEVID:
       ToggleButtonState(objId);
-      return GotoScreen(SCR_ADDRESS_ID, disp.GetDeviceID(), 0, INPUT_MODE_DEVID);
+      return GotoScreen(SCR_ADDRESS_ID, hdw->GetDeviceID(), 0, INPUT_MODE_DEVID);
 
     case UI_SETUP_ADR1:
       ToggleButtonState(objId);
-      return GotoScreen(SCR_ADDRESS_ID, disp.GetTrackAddress(1), 1, INPUT_MODE_TRACK_ADDR);
+      return GotoScreen(SCR_ADDRESS_ID, hdw->GetTrackAddress(1), 1, INPUT_MODE_TRACK_ADDR);
 
     case UI_SETUP_ADR2:
       ToggleButtonState(objId);
-      return GotoScreen(SCR_ADDRESS_ID, disp.GetTrackAddress(2), 2, INPUT_MODE_TRACK_ADDR);
+      return GotoScreen(SCR_ADDRESS_ID, hdw->GetTrackAddress(2), 2, INPUT_MODE_TRACK_ADDR);
 
     case UI_SETUP_ADR3:
       ToggleButtonState(objId);
-      return GotoScreen(SCR_ADDRESS_ID, disp.GetTrackAddress(3), 3, INPUT_MODE_TRACK_ADDR);
+      return GotoScreen(SCR_ADDRESS_ID, hdw->GetTrackAddress(3), 3, INPUT_MODE_TRACK_ADDR);
 
     case UI_SETUP_ADR4:
       ToggleButtonState(objId);
-      return GotoScreen(SCR_ADDRESS_ID, disp.GetTrackAddress(4), 4, INPUT_MODE_TRACK_ADDR);
+      return GotoScreen(SCR_ADDRESS_ID, hdw->GetTrackAddress(4), 4, INPUT_MODE_TRACK_ADDR);
 
     case UI_SETUP_RETURN:
       ToggleButtonState(objId);

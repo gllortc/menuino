@@ -80,8 +80,7 @@ typedef struct
 class DriveScreen : public Screen
 {
   bool            controlEnabled  = false;  // Indicate if an engine is controlled
-  uint8_t         xpnDeviceID     = 25;     // Store the XPN device ID
-  uint8_t         xpnMasterStatus;
+  //uint8_t         xpnDeviceID     = 25;     // Store the XPN device ID
   
   Engine          engine;
 
@@ -95,8 +94,8 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager hardware);
-  void Shown(ScreenParams *params);
+  void Initialize(HwdManager *hardware);
+  void Shown(ScreenParams *params) override;
   ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderClickHandler() override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
@@ -108,8 +107,10 @@ public:
   void GetEngineInfo();
   void GetEngineFuncs();
   void SetEngineSpeed(uint8_t speed);
+  void SetEngineDirection(uint8_t direction);
   void ToggleEngineFunction(uint8_t funcNum);
 
+  // Hardware handlers
   void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3) override;
   
 };

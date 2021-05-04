@@ -10,14 +10,14 @@ WaitScreen::WaitScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void WaitScreen::Initialize(HwdManager hardware)
+void WaitScreen::Initialize(HwdManager *hardware)
 {
-  disp    = hardware;
+  hdw     = hardware;
   id      = SCR_WAIT_ID;
   caption = "WAIT";
 
-  AddBitmap(UI_WAIT_BMP, (hardware.tft.width() - 36) / 2, (hardware.tft.height() - 36) / 2, 36, 36, COLOR_NAVBAR_WARNING, BMP_WAIT);
-  AddPushButton(UI_WAIT_CANCEL, (hardware.tft.width() - 80) / 2, ((hardware.tft.height() - 36) / 2) + 60, 80, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Cancel");
+  AddBitmap(UI_WAIT_BMP, (hdw->tft.width() - 36) / 2, (hdw->tft.height() - 36) / 2, 36, 36, COLOR_NAVBAR_WARNING, BMP_WAIT);
+  AddPushButton(UI_WAIT_CANCEL, (hdw->tft.width() - 80) / 2, ((hdw->tft.height() - 36) / 2) + 60, 80, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Cancel");
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -52,7 +52,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager lcdDisplay);
+  void Initialize(HwdManager *hardware);
   ScreenParams* ClickHandler(uint8_t objId) override;
   void Shown(ScreenParams *params) override;
 

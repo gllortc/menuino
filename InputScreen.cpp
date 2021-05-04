@@ -11,9 +11,9 @@ InputScreen::InputScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void InputScreen::Initialize(HwdManager lcdDisplay)
+void InputScreen::Initialize(HwdManager* hardware)
 {
-  disp    = lcdDisplay;
+  hdw     = hardware;
   id      = SCR_ADDRESS_ID;
   caption = LNG_EN_INPUT_HEADER;
 
@@ -83,7 +83,7 @@ void InputScreen::Shown(ScreenParams *params)
       break;
   }
 
-  disp.tft.setTextSize(2);
+  hdw->tft.setTextSize(2);
 }
 
 //----------------------------------------------
@@ -172,11 +172,12 @@ ScreenParams* InputScreen::OkButtonPressed(uint8_t objId)
       return GotoScreen(SCR_DRIVE_ID, inputValue);
 
     case INPUT_MODE_TRACK_ADDR:
-      disp.SetTrackAddress(track, inputValue);
+      hdw->SetTrackAddress(track, inputValue);
       return GotoScreen(SCR_SETUP_ID, inputValue);
 
     case INPUT_MODE_DEVID:
-      disp.SetDeviceID(lowByte(inputValue));
+      hdw->SetDeviceID(lowByte(inputValue));
+      hdw->xpnMaster.devId = lowByte(inputValue);
       return GotoScreen(SCR_SETUP_ID, id);
 
     default:

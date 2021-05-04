@@ -52,7 +52,7 @@ class Screen
 
 public:
 
-  HwdManager      disp;
+  HwdManager*     hdw;
   uint8_t         id;         // Screen ID
   const char*     caption;    // Screen caption
 
@@ -68,14 +68,13 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  virtual void Initialize(HwdManager lcdDisplay, uint8_t scrId, const char* scrCaption);
+  virtual void Initialize(HwdManager* hardware, uint8_t scrId, const char* scrCaption);
   virtual void Dispatch();
 
   // Hardware handlers
   virtual ScreenParams* ClickHandler(uint8_t objId);
   virtual void EncoderClickHandler();
   virtual void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir);
-  virtual void XpnMasterStatusNotifyHandler(uint8_t state);
   virtual void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
 
   // Screen managers
@@ -120,10 +119,5 @@ public:
   static void SetDeviceID(uint8_t id = 25);
   
 };
-
-//----------------------------------------------
-// Callbacks
-//----------------------------------------------
-extern void ClickedElement(uint8_t id) __attribute__ ((weak));
 
 #endif

@@ -10,11 +10,11 @@ Screen::Screen() {}
 //----------------------------------------------
 // Methods
 //----------------------------------------------
-void Screen::Initialize(HwdManager lcdDisplay, uint8_t scrId, const char* scrCaption)
+void Screen::Initialize(HwdManager* hardware, uint8_t scrId, const char* scrCaption)
 {
   id      = scrId;
   caption = scrCaption;
-  disp    = lcdDisplay;
+  hdw     = hardware;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ void Screen::Initialize(HwdManager lcdDisplay, uint8_t scrId, const char* scrCap
 //----------------------------------------------------------------------------------------------------
 void Screen::Dispatch(void)
 {
-  disp.CheckTouch();
+  hdw->CheckTouch();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -44,37 +44,6 @@ void Screen::EncoderClickHandler() {}
 // Handle encoder movements
 //----------------------------------------------------------------------------------------------------
 void Screen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) {}
-
-//----------------------------------------------------------------------------------------------------
-// Handle central station (XPN) status notifications
-//----------------------------------------------------------------------------------------------------
-void Screen::XpnMasterStatusNotifyHandler(uint8_t state) 
-{
-  disp.SetXPNStatus(state);
-  
-  switch (state) 
-  {
-    case csNormal:
-      disp.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_ON);
-      break;
-
-    case csShortCircuit: // Corto circuito - OFF
-      disp.DrawNotifyIcon(0, COLOR_NAVBAR_ERROR, BMP_XPN_SHORT);
-      break;
-    
-    case csTrackVoltageOff: // Sin tension en via - OFF
-      disp.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
-      break;
-
-    case csEmergencyStop: // Parada emergencia - StoP
-      disp.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
-      break;
-
-    case csServiceMode: // Programacion en modo servicio - Pro
-      disp.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_SERVICE);
-      break;
-  }
-}
 
 //----------------------------------------------------------------------------------------------------
 // Handle engine notifications
@@ -132,8 +101,8 @@ uint8_t Screen::GetScreenClickedObjectID(int x, int y)
 void Screen::Show(ScreenParams *params)
 {
   // Reset the screen
-  disp.tft.reset();
-  disp.DrawBaseScreen(caption);
+  hdw->tft.reset();
+  hdw->DrawBaseScreen(caption);
 
   // Draw all UI objects
   for (int i = 0; i < UI_MAX_OBJECTS; ++i)
@@ -170,11 +139,11 @@ void Screen::SetScreenCaption(const char* newCaption)
 {
   caption = newCaption;
 
-  disp.tft.fillRect(39, 21, 180, 50, COLOR_SCR_CAPTION_BACKGROUND);
-  disp.tft.setTextColor(COLOR_SCR_TEXT);
-  disp.tft.setTextSize(2);
-  disp.tft.setCursor(40, 40);
-  disp.tft.print(caption);
+  hdw->tft.fillRect(39, 21, 180, 50, COLOR_SCR_CAPTION_BACKGROUND);
+  hdw->tft.setTextColor(COLOR_SCR_TEXT);
+  hdw->tft.setTextSize(2);
+  hdw->tft.setCursor(40, 40);
+  hdw->tft.print(caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -318,20 +287,20 @@ void Screen::AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, u
 void Screen::DrawButton(uint8_t id)
 {
    // Draw button background
-   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
+   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
    
    if (uiObjects[id].bmpWidth == 0 && uiObjects[id].bmpHeight == 0)
    {
       // Draw caption
-      disp.tft.setTextSize(2);
-      disp.tft.setTextColor(COLOR_SCR_TEXT);
-      disp.tft.setCursor(uiObjects[id].x + ((uiObjects[id].width - 20) / 2), uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
-      disp.tft.print(uiObjects[id].caption);
+      hdw->tft.setTextSize(2);
+      hdw->tft.setTextColor(COLOR_SCR_TEXT);
+      hdw->tft.setCursor(uiObjects[id].x + ((uiObjects[id].width - 20) / 2), uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
+      hdw->tft.print(uiObjects[id].caption);
    }
    else
    {
       // Draw bitmap
-      disp.tft.drawBitmap(uiObjects[id].x + ((uiObjects[id].width - uiObjects[id].bmpWidth) / 2), 
+      hdw->tft.drawBitmap(uiObjects[id].x + ((uiObjects[id].width - uiObjects[id].bmpWidth) / 2), 
                           uiObjects[id].y + ((uiObjects[id].height - uiObjects[id].bmpHeight) / 2), 
                           uiObjects[id].bitmap, uiObjects[id].bmpWidth, uiObjects[id].bmpHeight, COLOR_SCR_TEXT);
    }
@@ -343,26 +312,26 @@ void Screen::DrawButton(uint8_t id)
 void Screen::DrawMenuButton(uint8_t id)
 {
    // Draw button background
-   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
+   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
    
    if (uiObjects[id].bmpWidth == 0 && uiObjects[id].bmpHeight == 0)
    {
       // Draw caption
-      disp.tft.setTextSize(2);
-      disp.tft.setTextColor(COLOR_SCR_TEXT);
-      disp.tft.setCursor(uiObjects[id].x + 20, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
+      hdw->tft.setTextSize(2);
+      hdw->tft.setTextColor(COLOR_SCR_TEXT);
+      hdw->tft.setCursor(uiObjects[id].x + 20, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
    }
    else
    {
       // Draw bitmap
-      disp.tft.drawBitmap(uiObjects[id].x + 20, 
+      hdw->tft.drawBitmap(uiObjects[id].x + 20, 
                           uiObjects[id].y + ((uiObjects[id].height - uiObjects[id].bmpHeight) / 2), 
                           uiObjects[id].bitmap, uiObjects[id].bmpWidth, uiObjects[id].bmpHeight, COLOR_SCR_TEXT);
 
-      disp.tft.setCursor(uiObjects[id].x + uiObjects[id].bmpWidth + 40, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
+      hdw->tft.setCursor(uiObjects[id].x + uiObjects[id].bmpWidth + 40, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
    }
 
-   disp.tft.print(uiObjects[id].caption);
+   hdw->tft.print(uiObjects[id].caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -420,13 +389,13 @@ void Screen::SelectButton(uint8_t objId)
   for (int i = 0; i < UI_MAX_OBJECTS; i++)
   {
     if (uiObjects[i].type == UI_OBJTYPE_MENU_BUTTON && uiObjects[i].selected)
-      disp.tft.drawRect(uiObjects[i].x, uiObjects[i].y, uiObjects[i].width, uiObjects[i].height, uiObjects[i].colorUnpressed);
+      hdw->tft.drawRect(uiObjects[i].x, uiObjects[i].y, uiObjects[i].width, uiObjects[i].height, uiObjects[i].colorUnpressed);
 
     uiObjects[i].selected = false;
   }
 
   uiObjects[objId].selected = true;
-  disp.tft.drawRect(uiObjects[objId].x, uiObjects[objId].y, uiObjects[objId].width, uiObjects[objId].height, COLOR_BTN_SELECTED);
+  hdw->tft.drawRect(uiObjects[objId].x, uiObjects[objId].y, uiObjects[objId].width, uiObjects[objId].height, COLOR_BTN_SELECTED);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -455,12 +424,12 @@ void Screen::AddTextBox(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint
 void Screen::DrawTextBox(uint8_t id)
 {
    // Draw button background
-   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
-   disp.tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorPressed);
-   disp.tft.setTextColor(COLOR_SCR_TEXT);
-   disp.tft.setTextSize(3);
-   disp.tft.setCursor(uiObjects[id].x + 10, uiObjects[id].y + 10);
-   disp.tft.print(uiObjects[id].caption);
+   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
+   hdw->tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorPressed);
+   hdw->tft.setTextColor(COLOR_SCR_TEXT);
+   hdw->tft.setTextSize(3);
+   hdw->tft.setCursor(uiObjects[id].x + 10, uiObjects[id].y + 10);
+   hdw->tft.print(uiObjects[id].caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -499,9 +468,9 @@ void Screen::AddProgressBar(uint8_t id, uint16_t x, uint16_t y, uint16_t width, 
 //----------------------------------------------
 void Screen::DrawProgressBar(uint8_t id)
 {
-   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed);
-   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, map(uiObjects[id].value, 0, 128, 0, uiObjects[id].width), uiObjects[id].height, uiObjects[id].colorPressed);
-   disp.tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorBorder);
+   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed);
+   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, map(uiObjects[id].value, 0, 128, 0, uiObjects[id].width), uiObjects[id].height, uiObjects[id].colorPressed);
+   hdw->tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorBorder);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -537,6 +506,6 @@ void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint1
 //----------------------------------------------
 void Screen::DrawBitmap(uint8_t id)
 {
-   disp.tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
-   disp.tft.drawBitmap(uiObjects[id].x, uiObjects[id].y, uiObjects[id].bitmap, uiObjects[id].width, uiObjects[id].height, COLOR_SCR_TEXT);
+   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
+   hdw->tft.drawBitmap(uiObjects[id].x, uiObjects[id].y, uiObjects[id].bitmap, uiObjects[id].width, uiObjects[id].height, COLOR_SCR_TEXT);
 }

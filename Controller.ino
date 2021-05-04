@@ -20,7 +20,7 @@ void setup()
   pinMode(BOARD_LED, OUTPUT);
   digitalWrite(BOARD_LED, HIGH); 
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   menuino.Initialize();
 }
@@ -52,6 +52,15 @@ void OnEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 void OnEncoderClick()
 {
   menuino.HandleEncoderClick();
+}
+
+//--------------------------------------------------------------------------------------------
+// XPN version callback
+// Unitl this method is not called, the operations are blocked
+//--------------------------------------------------------------------------------------------
+void notifyXNetVer(uint8_t ver, uint8_t hdwtype)
+{
+  menuino.HandleXPNInfo(ver, hdwtype);
 }
 
 //------------------------------------------------------

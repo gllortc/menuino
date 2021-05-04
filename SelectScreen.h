@@ -34,7 +34,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager lcdDisplay);
+  void Initialize(HwdManager *hardware);
   void Shown(ScreenParams *params) override;
   ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;

@@ -15,6 +15,7 @@
 #include <EncoderMenuSwitch.h>
 #include <TouchScreen.h>
 #include <XpressNet.h>
+#include "ScreenObjects.h"
 
 // LCD hardware pins definition
 #define MINPRESSURE     200
@@ -35,6 +36,16 @@
 
 class HwdManager
 {
+  // Screen calling parameters
+  typedef struct 
+  {
+    uint8_t status    = csTrackVoltageOff;
+    uint8_t vermajor  = 0;
+    uint8_t verminor  = 0;
+    uint8_t type      = 99;
+    uint8_t devId     = 0;
+  } XpnMasterData;
+
   // most mcufriend shields use these pins and Portrait mode:
   uint8_t       YP = A1;  // must be an analog pin, use "An" notation!
   uint8_t       XM = A2;  // must be an analog pin, use "An" notation!
@@ -54,14 +65,14 @@ class HwdManager
   TouchScreen   ts = TouchScreen(XP, YP, XM, YM, 260);
   TSPoint       tp;
 
-  // XPN internal variables
-  uint8_t       xpnMasterStatus = csTrackVoltageOff;
-
 public:
 
-  EncoderMenuSwitch encoder;
   MCUFRIEND_kbv     tft;
+
+  EncoderMenuSwitch encoder;
+  
   XpressNetClass    xpn;
+  XpnMasterData     xpnMaster;
 
   //----------------------------------------------
   // Constructors
@@ -76,6 +87,7 @@ public:
   void CheckTouch();
   void DrawBaseScreen(const char* caption, bool resetNotifyBar = false);
   void DrawNotifyIcon(uint8_t index, uint16_t color, const unsigned char *bitmap);
+  void PrintNotifyText(const char *text, uint16_t color = COLOR_SCR_TEXT);
   void PrintTextLine(const char *text);
   void PrintErrTextLine(const char *text);
 
@@ -83,9 +95,9 @@ public:
   // APP specific methods
   //----------------------------------------------
   
-  // XPN management
-  void SetXPNStatus(uint8_t status);
-  uint8_t GetXPNStatus();
+//  // XPN management
+//  void SetXPNStatus(uint8_t status);
+//  uint8_t GetXPNStatus();
   
   // Settings management
   static uint16_t GetTrackAddress(uint8_t trackNum);
@@ -98,6 +110,5 @@ public:
 // Callbacks
 //----------------------------------------------
 extern void OnClick(uint16_t xpos, uint16_t ypos) __attribute__ ((weak));
-extern void OnEncoderMoved(uint8_t dir) __attribute__ ((weak));
 
 #endif

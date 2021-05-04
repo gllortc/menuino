@@ -12,12 +12,13 @@
 #include <Arduino.h>
 #include "Screen.h"
 
-#define MENU_OPTIONS_COUNT 3
+#define MENU_OPTIONS_COUNT 4
 
 // UI elements ID definition
 #define UI_MENU_SELECT  0
 #define UI_MENU_MANUAL  1
 #define UI_MENU_SETUP   2
+#define UI_MENU_INFO    3
 
 class MenuScreen : public Screen
 {
@@ -33,7 +34,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager lcdDisplay);
+  void Initialize(HwdManager* hardware);
   void Shown(ScreenParams *params) override;
   ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderClickHandler() override;
