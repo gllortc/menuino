@@ -3,11 +3,25 @@
 //------------------------------------------------------------------
 
 #include <EncoderMenuSwitch.h>
-#include "Menuino.h" 
+#include <OpenSmart32.h>
+#include <XpnManager.h>
+#include "Menuino.h"
 
-// On board LED in
-#define BOARD_LED 13
+// PIN definicitons
+#define BOARD_LED           13
 
+#define ENCODER_PIN_A       25
+#define ENCODER_PIN_B       27
+#define ENCODER_PIN_SWITCH  29
+
+#define XPN_PIN_TXRX        31
+
+// Hardware declarations
+OpenSmart32       display;
+EncoderMenuSwitch encoder;
+XpnManager*       xpn;
+
+// MENUino declaration
 Menuino           menuino;
 
 //------------------------------------------------------------------
@@ -22,20 +36,28 @@ void setup()
 
   Serial.begin(115200);
 
-  menuino.Initialize();
+  display.Initialize();
+  encoder.Initialize(ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_SWITCH);
+
+  xpn = XpnManager::getInstance();
+  xpn->Initialize(XPN_PIN_TXRX);
+
+  menuino.Initialize(&display);
 }
  
 void loop()
 {
-  menuino.Dispatch();
+  xpn->Dispatch();
+  display.Dispatch();
+  encoder.Dispatch();
 }
 
 //----------------------------------------------
-// Touchscreen callback
+// Display click callback
 //----------------------------------------------
-void OnClick(uint16_t xpos, uint16_t ypos) 
+void OnDisplayClick(uint16_t xpos, uint16_t ypos)
 {
-  menuino.HandleScreenClick(xpos, ypos);
+  menuino.HandleDisplayClick(xpos, ypos);
 }
 
 //----------------------------------------------
@@ -54,19 +76,18 @@ void OnEncoderClick()
   menuino.HandleEncoderClick();
 }
 
-//--------------------------------------------------------------------------------------------
-// XPN version callback
-// Unitl this method is not called, the operations are blocked
-//--------------------------------------------------------------------------------------------
-void notifyXNetVer(uint8_t ver, uint8_t hdwtype)
+//------------------------------------------------------
+// XPN Callback: XPN connection stablished
+//------------------------------------------------------
+void OnXpnMasterConnected()
 {
-  menuino.HandleXPNInfo(ver, hdwtype);
+  OnXpnPowerChanged(xpn->GetPowerStatus());
 }
 
 //------------------------------------------------------
 // XPN Callback: XPN power notification
 //------------------------------------------------------
-void notifyXNetPower(uint8_t state) 
+void OnXpnPowerChanged(uint8_t state) 
 {
   menuino.HandleMasterStatusNotify(state);
 }
@@ -74,15 +95,15 @@ void notifyXNetPower(uint8_t state)
 //------------------------------------------------------
 // XPN Callback: Locomotive status notification
 //------------------------------------------------------
-void notifyLokAll(uint8_t adrHigh, uint8_t adrLow, boolean busy, uint8_t steps, uint8_t speed, uint8_t direction, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3, boolean req) 
+void OnXpnEngineChanged(XpnEngine *engine)
 {
-  menuino.HandleEngineNotify(adrHigh, adrLow, steps, speed, direction, F0, F1, F2, F3);
+  menuino.HandleEngineNotify(engine);
 }
 
 //------------------------------------------------------
 // XPN Callback: network status notification
 //------------------------------------------------------
-void notifyXNetStatus(uint8_t state) 
+void OnXpnNetworkStatus(uint8_t state) 
 {
   // TODO: should be a separate LED in the controller
   digitalWrite(LED_BUILTIN, state); 

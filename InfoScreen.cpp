@@ -10,13 +10,25 @@ InfoScreen::InfoScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void InfoScreen::Initialize(HwdManager *hardware)
+void InfoScreen::InitializeUI()
 {
-  hdw     = hardware;
   id      = SCR_INFO_ID;
   caption = "INFORMATION";
+  xpn     = XpnManager::getInstance();
 
-  AddPushButton(UI_INFO_BACK, (hdw->tft.width() - 160) / 2, ((hdw->tft.height() - 36) / 2) + 60, 160, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Return");
+  AddBitmap(UI_INFO_APP_ICON, 17, 90, 22, 30, 0xFF10, BMP_APP_ICON);
+  AddLabel(UI_INFO_APP_TITLE, 50, 100, 2, COLOR_SCR_TEXT, "DUAL CONTROL");
+  AddLabel(UI_INFO_MASTER, 17, 145, 1, COLOR_SCR_TEXT, "CENTRAL/MASTER");
+  AddLabel(UI_INFO_HW_TYPE, 17, 155, 2, COLOR_SCR_TEXT, "");
+  AddLabel(UI_INFO_LBL_DEVICE, 17, 180, 1, COLOR_SCR_TEXT, "XPN DEVICE UID (1..31)");
+  AddLabel(UI_INFO_TXT_DEVICE, 17, 190, 2, COLOR_SCR_TEXT, "  ");
+  AddLabel(UI_INFO_LBL_VER, 17, 215, 1, COLOR_SCR_TEXT, "SOFTWARE VERSION");
+  AddLabel(UI_INFO_TXT_VER, 17, 225, 2, COLOR_SCR_TEXT, "v0.1-R");
+  AddLabel(UI_INFO_LBL_ABOUT, 17, 250, 1, COLOR_SCR_TEXT, "ABOUT");
+  AddLabel(UI_INFO_TXT_ABOUT, 17, 260, 1, COLOR_BTN_WARNING_NORMAL, "Copyright (c) 2021 Railwaymania");
+  AddLabel(UI_INFO_TXT_ABOUT2, 17, 270, 1, COLOR_BTN_WARNING_NORMAL, "Gerard llort Casanova");
+  AddLine(UI_INFO_APP_ULINE, 17, 127, display->tft.width() - 17, 127, 0xCE9A);
+  AddPushButton(UI_INFO_BTN_BACK, (display->tft.width() - 180) / 2, ((display->tft.height() - 36) * 3 / 4) + 60, 180, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, "Return");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -25,27 +37,8 @@ void InfoScreen::Initialize(HwdManager *hardware)
 //----------------------------------------------------------------------------------------------------
 void InfoScreen::Shown(ScreenParams *params) 
 {
-  // Update engine information
-  hdw->tft.setCursor(1, 85);
-  hdw->tft.setTextSize(2);
-  hdw->tft.println(F("Master"));
-  hdw->tft.setTextSize(1);
-  hdw->tft.print("Hardware: "); 
-  switch (hdw->xpnMaster.type)
-  {
-    case 0x00: hdw->tft.println(F("LZV100"));       break;
-    case 0x01: hdw->tft.println(F("LH 200"));       break;
-    case 0x02: hdw->tft.println(F("DPC"));          break;
-    case 0x03: hdw->tft.println(F("Control Plus")); break;
-    default:   hdw->tft.println(F("Unknown"));      break;
-  }  
-  hdw->tft.print("Version : "); hdw->tft.print(hdw->xpnMaster.vermajor); hdw->tft.print(F(".")); hdw->tft.println(hdw->xpnMaster.verminor);
-  hdw->tft.setTextSize(2);
-  hdw->tft.println(F("Slave"));
-  hdw->tft.setTextSize(1);
-  hdw->tft.print("XPN ID  : "); hdw->tft.println(hdw->xpnMaster.devId);
-  hdw->tft.print("Version : "); hdw->tft.println(F("1.0"));
-  hdw->tft.print("Author  : "); hdw->tft.println(F("Gerard Llort Casanova"));
+  SetLabelTextValue(UI_INFO_HW_TYPE, xpn->master.type);
+  SetLabelIntValue(UI_INFO_TXT_DEVICE, xpn->GetDeviceID());
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -57,7 +50,7 @@ ScreenParams* InfoScreen::ClickHandler(uint8_t objId)
 
   switch (objId)
   {
-    case UI_INFO_BACK:
+    case UI_INFO_BTN_BACK:
       return GotoScreen(SCR_MENU_ID);
   }
 

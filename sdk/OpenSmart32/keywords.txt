@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring Map For FastLED
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+Initialize	      KEYWORD2
+Dispatch	         KEYWORD2
+DrawBaseScreen	   KEYWORD2
+DrawNotifyIcon	   KEYWORD2
+PrintNotifyText   KEYWORD2
+PrintTextLine     KEYWORD2
+PrintErrTextLine  KEYWORD2
+OnDisplayClick    KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MINPRESSURE       LITERAL1
+MAXPRESSURE	      LITERAL1
+SWAP              LITERAL1

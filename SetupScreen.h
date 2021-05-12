@@ -24,7 +24,8 @@
 
 class SetupScreen : public Screen
 {
-  uint8_t selIdx = -1;   // Selected menu ID
+  uint8_t     selIdx = -1;   // Selected menu ID
+  XpnManager* xpn;
 
 public:
 
@@ -36,7 +37,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager *hardware);
+  void InitializeUI() override;
   void Shown(ScreenParams *params) override;
   ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;

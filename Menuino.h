@@ -10,7 +10,7 @@
 #define _MENUINO_H 
 
 #include <Arduino.h>
-#include "HwdManager.h" 
+#include <XpnManager.h>
 #include "MenuScreen.h" 
 #include "SelectScreen.h" 
 #include "DriveScreen.h" 
@@ -21,7 +21,8 @@
 
 class Menuino 
 {
-  HwdManager     hardware;
+  OpenSmart32*   display;
+  XpnManager*    xpn;
 
   Screen*        scrCurrent;
   MenuScreen*    scrMenu;
@@ -32,7 +33,7 @@ class Menuino
   SetupScreen*   scrSetup;
   InfoScreen*    scrInfo;
 
-  ScreenParams* params;
+  ScreenParams*  params;
 
 public:
 
@@ -44,17 +45,20 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize();
+  void Initialize(OpenSmart32* tft);
   void Dispatch();
   void ShowScreen(ScreenParams* params);
-  void HandleScreenClick(uint16_t xpos, uint16_t ypos);
-  void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
+  Screen* GetCurrentScreen();
+
+  //----------------------------------------------
+  // Event handlers
+  //----------------------------------------------
+  void HandleDisplayClick(uint16_t xpos, uint16_t ypos);
+  void HandleEngineNotify(XpnEngine *engine);
   void HandleMasterStatusNotify(uint8_t status);
-  void HandleXPNInfo(uint8_t ver, uint8_t hdwtype);
   void HandleEncoderMoved(EncoderMenuSwitch::EncoderDirection dir);
   void HandleEncoderClick();
-  Screen* GetCurrentScreen();
-  
+
 };
 
 #endif

@@ -10,36 +10,38 @@ Menuino::Menuino() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void Menuino::Initialize()
+void Menuino::Initialize(OpenSmart32* tft)
 {
-  // Initialize the display
-  hardware.Initialize();
-
   // Initialize the screen parameters
   params = new ScreenParams();
 
   // Initialize the screens
   scrMenu = new MenuScreen();
-  scrMenu->Initialize(&hardware);
+  scrMenu->Initialize(tft);
 
   scrSelect = new SelectScreen();
-  scrSelect->Initialize(&hardware);
+  scrSelect->Initialize(tft);
 
   scrDrive = new DriveScreen();
-  scrDrive->Initialize(&hardware);
+  scrDrive->Initialize(tft);
 
   scrInput = new InputScreen();
-  scrInput->Initialize(&hardware);
+  scrInput->Initialize(tft);
 
   scrSetup = new SetupScreen();
-  scrSetup->Initialize(&hardware);
+  scrSetup->Initialize(tft);
 
   scrInfo = new InfoScreen();
-  scrInfo->Initialize(&hardware);
+  scrInfo->Initialize(tft);
+
+  // Draw no connection icon
+  scrMenu->DrawNotifyIcon(0, COLOR_NAVBAR_DISABLED, BMP_XPN_OFF);
 
   // Show initial screen
   params->gotoScr = SCR_MENU_ID;
   ShowScreen(params);
+
+  xpn = XpnManager::getInstance();
 }
 
 //----------------------------------------------
@@ -47,14 +49,14 @@ void Menuino::Initialize()
 //----------------------------------------------
 void Menuino::Dispatch()
 {
-  hardware.Dispatch();
+  // hardware.Dispatch();
   // scrCurrent->Dispatch();
 }
 
 //----------------------------------------------
 // Handle the screen clicks
 //----------------------------------------------
-void Menuino::HandleScreenClick(uint16_t xpos, uint16_t ypos)
+void Menuino::HandleDisplayClick(uint16_t xpos, uint16_t ypos)
 {
   uint8_t objId = scrCurrent->GetScreenClickedObjectID(xpos, ypos);
   if (objId == UI_OBJECT_NULL) return;
@@ -84,9 +86,9 @@ void Menuino::HandleEncoderClick()
 //----------------------------------------------
 // Handle engine notification received
 //----------------------------------------------
-void Menuino::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3)
+void Menuino::HandleEngineNotify(XpnEngine *engine)
 {
-  scrCurrent->HandleEngineNotify(adrHigh, adrLow, steps, speed, dir, F0, F1, F2, F3);
+  scrCurrent->HandleEngineNotify(engine);
 }
 
 //----------------------------------------------
@@ -94,41 +96,41 @@ void Menuino::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps,
 //----------------------------------------------
 void Menuino::HandleMasterStatusNotify(uint8_t status)
 {
-  hardware.xpnMaster.status = status;
+  // xpn->master.status = status;
   
-  switch (hardware.xpnMaster.status) 
+  switch (xpn->master.status) 
   {
     case csNormal:
-      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_ON);
+      scrCurrent->DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_ON);
       break;
 
     case csShortCircuit: // Corto circuito - OFF
-      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_ERROR, BMP_XPN_SHORT);
+      scrCurrent->DrawNotifyIcon(0, COLOR_NAVBAR_ERROR, BMP_XPN_SHORT);
       break;
     
     case csTrackVoltageOff: // Sin tension en via - OFF
-      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
+      scrCurrent->DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
       break;
 
     case csEmergencyStop: // Parada emergencia - StoP
-      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
+      scrCurrent->DrawNotifyIcon(0, COLOR_NAVBAR_WARNING, BMP_XPN_WARN);
       break;
 
     case csServiceMode: // Programacion en modo servicio - Pro
-      hardware.DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_SERVICE);
+      scrCurrent->DrawNotifyIcon(0, COLOR_NAVBAR_NORMAL, BMP_XPN_SERVICE);
       break;
   }
 }
 
-//----------------------------------------------
-// Handle central status information
-//----------------------------------------------
-void Menuino::HandleXPNInfo(uint8_t ver, uint8_t hdwtype)
-{
-  hardware.xpnMaster.vermajor = ver >> 4;
-  hardware.xpnMaster.verminor = (ver && 0xF0);
-  hardware.xpnMaster.type     = hdwtype;
-}
+////----------------------------------------------
+//// Handle central status information
+////----------------------------------------------
+//void Menuino::HandleXPNInfo(uint8_t ver, uint8_t hdwtype)
+//{
+//  hardware.xpnMaster.vermajor = ver >> 4;
+//  hardware.xpnMaster.verminor = (ver && 0xF0);
+//  hardware.xpnMaster.type     = hdwtype;
+//}
 
 //----------------------------------------------
 // Gets the current screen instance

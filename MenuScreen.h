@@ -15,10 +15,11 @@
 #define MENU_OPTIONS_COUNT 4
 
 // UI elements ID definition
-#define UI_MENU_SELECT  0
-#define UI_MENU_MANUAL  1
-#define UI_MENU_SETUP   2
-#define UI_MENU_INFO    3
+#define UI_MENU_SELECT    0
+#define UI_MENU_MANUAL    1
+#define UI_MENU_SETUP     2
+#define UI_MENU_INFO      3
+#define UI_MENU_IMG_LOGO  4
 
 class MenuScreen : public Screen
 {
@@ -34,7 +35,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager* hardware);
+  void InitializeUI() override;
   void Shown(ScreenParams *params) override;
   ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderClickHandler() override;

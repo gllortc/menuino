@@ -1,5 +1,4 @@
 #include "Screen.h"
-#include "HwdManager.h" 
 #include "ScreenObjects.h" 
 
 //----------------------------------------------
@@ -10,20 +9,24 @@ Screen::Screen() {}
 //----------------------------------------------
 // Methods
 //----------------------------------------------
-void Screen::Initialize(HwdManager* hardware, uint8_t scrId, const char* scrCaption)
+void Screen::Initialize(OpenSmart32* tft) //, uint8_t scrId, const char* scrCaption)
 {
-  id      = scrId;
-  caption = scrCaption;
-  hdw     = hardware;
+  display = tft;
+  InitializeUI();
 }
+
+//----------------------------------------------
+// Initialize the UI objects
+//----------------------------------------------
+void Screen::InitializeUI() {}
 
 //----------------------------------------------------------------------------------------------------
 // Dispatch screen events
 //----------------------------------------------------------------------------------------------------
-void Screen::Dispatch(void)
-{
-  hdw->CheckTouch();
-}
+//void Screen::Dispatch(void)
+//{
+//  display->CheckTouch();
+//}
 
 //----------------------------------------------------------------------------------------------------
 // Handle screen clicks
@@ -48,7 +51,7 @@ void Screen::EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) {}
 //----------------------------------------------------------------------------------------------------
 // Handle engine notifications
 //----------------------------------------------------------------------------------------------------
-void Screen::HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3) {}
+void Screen::HandleEngineNotify(XpnEngine *engine) {}
 
 //----------------------------------------------------------------------------------------------------
 // Preoare screen parameters to go to another screen
@@ -101,8 +104,8 @@ uint8_t Screen::GetScreenClickedObjectID(int x, int y)
 void Screen::Show(ScreenParams *params)
 {
   // Reset the screen
-  hdw->tft.reset();
-  hdw->DrawBaseScreen(caption);
+  display->tft.reset();
+  DrawBaseScreen(caption, false);
 
   // Draw all UI objects
   for (int i = 0; i < UI_MAX_OBJECTS; ++i)
@@ -114,9 +117,11 @@ void Screen::Show(ScreenParams *params)
         case UI_OBJTYPE_CHECK_BUTTON: 
         case UI_OBJTYPE_PUSH_BUTTON:  DrawButton(i);      break;
         case UI_OBJTYPE_MENU_BUTTON:  DrawMenuButton(i);  break;
+        case UI_OBJTYPE_TEXT_LABEL:   DrawLabel(i);       break;
         case UI_OBJTYPE_TEXTBOX:      DrawTextBox(i);     break;
         case UI_OBJTYPE_PROGRESSBAR:  DrawProgressBar(i); break;
         case UI_OBJTYPE_BITMAP:       DrawBitmap(i);      break;
+        case UI_OBJTYPE_LINE:         DrawLine(i);        break;
         default:                                          break;
       }
     }
@@ -139,11 +144,11 @@ void Screen::SetScreenCaption(const char* newCaption)
 {
   caption = newCaption;
 
-  hdw->tft.fillRect(39, 21, 180, 50, COLOR_SCR_CAPTION_BACKGROUND);
-  hdw->tft.setTextColor(COLOR_SCR_TEXT);
-  hdw->tft.setTextSize(2);
-  hdw->tft.setCursor(40, 40);
-  hdw->tft.print(caption);
+  display->tft.fillRect(39, 21, 180, 50, COLOR_SCR_CAPTION_BACKGROUND);
+  display->tft.setTextColor(COLOR_SCR_TEXT);
+  display->tft.setTextSize(2);
+  display->tft.setCursor(40, 40);
+  display->tft.print(caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -287,20 +292,20 @@ void Screen::AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, u
 void Screen::DrawButton(uint8_t id)
 {
    // Draw button background
-   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
+   display->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
    
    if (uiObjects[id].bmpWidth == 0 && uiObjects[id].bmpHeight == 0)
    {
       // Draw caption
-      hdw->tft.setTextSize(2);
-      hdw->tft.setTextColor(COLOR_SCR_TEXT);
-      hdw->tft.setCursor(uiObjects[id].x + ((uiObjects[id].width - 20) / 2), uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
-      hdw->tft.print(uiObjects[id].caption);
+      display->tft.setTextSize(2);
+      display->tft.setTextColor(COLOR_SCR_TEXT);
+      display->tft.setCursor(uiObjects[id].x + (uiObjects[id].width / 2) - (strlen(uiObjects[id].caption) * 12 / 2), uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
+      display->tft.print(uiObjects[id].caption);
    }
    else
    {
       // Draw bitmap
-      hdw->tft.drawBitmap(uiObjects[id].x + ((uiObjects[id].width - uiObjects[id].bmpWidth) / 2), 
+      display->tft.drawBitmap(uiObjects[id].x + ((uiObjects[id].width - uiObjects[id].bmpWidth) / 2), 
                           uiObjects[id].y + ((uiObjects[id].height - uiObjects[id].bmpHeight) / 2), 
                           uiObjects[id].bitmap, uiObjects[id].bmpWidth, uiObjects[id].bmpHeight, COLOR_SCR_TEXT);
    }
@@ -312,26 +317,26 @@ void Screen::DrawButton(uint8_t id)
 void Screen::DrawMenuButton(uint8_t id)
 {
    // Draw button background
-   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
+   display->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, (uiObjects[id].pressed ? uiObjects[id].colorPressed : uiObjects[id].colorUnpressed));      
    
    if (uiObjects[id].bmpWidth == 0 && uiObjects[id].bmpHeight == 0)
    {
       // Draw caption
-      hdw->tft.setTextSize(2);
-      hdw->tft.setTextColor(COLOR_SCR_TEXT);
-      hdw->tft.setCursor(uiObjects[id].x + 20, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
+      display->tft.setTextSize(2);
+      display->tft.setTextColor(COLOR_SCR_TEXT);
+      display->tft.setCursor(uiObjects[id].x + 20, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
    }
    else
    {
       // Draw bitmap
-      hdw->tft.drawBitmap(uiObjects[id].x + 20, 
-                          uiObjects[id].y + ((uiObjects[id].height - uiObjects[id].bmpHeight) / 2), 
-                          uiObjects[id].bitmap, uiObjects[id].bmpWidth, uiObjects[id].bmpHeight, COLOR_SCR_TEXT);
+      display->tft.drawBitmap(uiObjects[id].x + 20, 
+                              uiObjects[id].y + ((uiObjects[id].height - uiObjects[id].bmpHeight) / 2), 
+                              uiObjects[id].bitmap, uiObjects[id].bmpWidth, uiObjects[id].bmpHeight, COLOR_SCR_TEXT);
 
-      hdw->tft.setCursor(uiObjects[id].x + uiObjects[id].bmpWidth + 40, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
+      display->tft.setCursor(uiObjects[id].x + uiObjects[id].bmpWidth + 40, uiObjects[id].y + ((uiObjects[id].height - 13) / 2));
    }
 
-   hdw->tft.print(uiObjects[id].caption);
+   display->tft.print(uiObjects[id].caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -389,13 +394,72 @@ void Screen::SelectButton(uint8_t objId)
   for (int i = 0; i < UI_MAX_OBJECTS; i++)
   {
     if (uiObjects[i].type == UI_OBJTYPE_MENU_BUTTON && uiObjects[i].selected)
-      hdw->tft.drawRect(uiObjects[i].x, uiObjects[i].y, uiObjects[i].width, uiObjects[i].height, uiObjects[i].colorUnpressed);
+      display->tft.drawRect(uiObjects[i].x, uiObjects[i].y, uiObjects[i].width, uiObjects[i].height, uiObjects[i].colorUnpressed);
 
     uiObjects[i].selected = false;
   }
 
   uiObjects[objId].selected = true;
-  hdw->tft.drawRect(uiObjects[objId].x, uiObjects[objId].y, uiObjects[objId].width, uiObjects[objId].height, COLOR_BTN_SELECTED);
+  display->tft.drawRect(uiObjects[objId].x, uiObjects[objId].y, uiObjects[objId].width, uiObjects[objId].height, COLOR_BTN_SELECTED);
+}
+
+//----------------------------------------------------------------------------------------------------
+// Add a text label to the current screen
+//----------------------------------------------------------------------------------------------------
+void Screen::AddLabel(uint8_t id, uint16_t x, uint16_t y, uint8_t size, uint16_t color, const char* text)
+{
+  if (!uiObjects[id].initialized)
+   {
+      uiObjects[id].initialized    = true;
+      uiObjects[id].type           = UI_OBJTYPE_TEXT_LABEL;
+      uiObjects[id].x              = x;
+      uiObjects[id].y              = y;
+      uiObjects[id].width          = size;
+      uiObjects[id].colorPressed   = color;
+      uiObjects[id].caption        = text;
+   }
+}
+
+//----------------------------------------------
+// Draw a text box object
+//----------------------------------------------
+void Screen::DrawLabel(uint8_t id)
+{
+  display->tft.setTextColor(uiObjects[id].colorPressed);
+  display->tft.setTextSize(uiObjects[id].width);
+  display->tft.setCursor(uiObjects[id].x, uiObjects[id].y);
+  display->tft.print(uiObjects[id].caption);
+}
+
+//----------------------------------------------
+// Update de label value and redraw it
+//----------------------------------------------
+void Screen::SetLabelTextValue(uint8_t id, const char* text)
+{
+  // Delete previous text
+  display->tft.setTextColor(COLOR_SCR_BACKGROUND);
+  display->tft.setTextSize(uiObjects[id].width);
+  display->tft.setCursor(uiObjects[id].x, uiObjects[id].y);
+  display->tft.print(uiObjects[id].caption);
+
+  // Update text
+  uiObjects[id].caption = text;
+  DrawLabel(id);
+}
+
+void Screen::SetLabelIntValue(uint8_t id, uint16_t value)
+{
+  // Delete previous text
+  display->tft.setTextColor(COLOR_SCR_BACKGROUND);
+  display->tft.setTextSize(uiObjects[id].width);
+  display->tft.setCursor(uiObjects[id].x, uiObjects[id].y);
+  display->tft.print(uiObjects[id].caption);
+
+  // Update text
+  char buff[10];
+  itoa(value, buff, 10);
+  uiObjects[id].caption = buff;
+  DrawLabel(id);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -406,12 +470,11 @@ void Screen::AddTextBox(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint
    if (!uiObjects[id].initialized)
    {
       uiObjects[id].initialized    = true;
-      uiObjects[id].type           = UI_OBJTYPE_PUSH_BUTTON;
+      uiObjects[id].type           = UI_OBJTYPE_TEXTBOX;
       uiObjects[id].x              = x;
       uiObjects[id].y              = y;
       uiObjects[id].width          = width;
       uiObjects[id].height         = height;
-      uiObjects[id].pressed        = false;
       uiObjects[id].colorPressed   = colBorder;
       uiObjects[id].colorUnpressed = colBackground;
       uiObjects[id].caption        = text;
@@ -424,12 +487,12 @@ void Screen::AddTextBox(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint
 void Screen::DrawTextBox(uint8_t id)
 {
    // Draw button background
-   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
-   hdw->tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorPressed);
-   hdw->tft.setTextColor(COLOR_SCR_TEXT);
-   hdw->tft.setTextSize(3);
-   hdw->tft.setCursor(uiObjects[id].x + 10, uiObjects[id].y + 10);
-   hdw->tft.print(uiObjects[id].caption);
+   display->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
+   display->tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorPressed);
+   display->tft.setTextColor(COLOR_SCR_TEXT);
+   display->tft.setTextSize(3);
+   display->tft.setCursor(uiObjects[id].x + 10, uiObjects[id].y + 10);
+   display->tft.print(uiObjects[id].caption);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -468,9 +531,9 @@ void Screen::AddProgressBar(uint8_t id, uint16_t x, uint16_t y, uint16_t width, 
 //----------------------------------------------
 void Screen::DrawProgressBar(uint8_t id)
 {
-   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed);
-   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, map(uiObjects[id].value, 0, 128, 0, uiObjects[id].width), uiObjects[id].height, uiObjects[id].colorPressed);
-   hdw->tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorBorder);
+   display->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed);
+   display->tft.fillRect(uiObjects[id].x, uiObjects[id].y, map(uiObjects[id].value, 0, 128, 0, uiObjects[id].width), uiObjects[id].height, uiObjects[id].colorPressed);
+   display->tft.drawRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorBorder);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -485,7 +548,7 @@ void Screen::SetProgressBarValue(uint8_t id, uint16_t value)
 //----------------------------------------------------------------------------------------------------
 // Add a check button to the current screen
 //----------------------------------------------------------------------------------------------------
-void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color, const char* fileName)
+void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color, const unsigned char *bitmap)
 {
    if (!uiObjects[id].initialized)
    {
@@ -497,7 +560,7 @@ void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint1
       uiObjects[id].height         = height;
       uiObjects[id].pressed        = false;
       uiObjects[id].colorUnpressed = color;
-      uiObjects[id].caption        = fileName;
+      uiObjects[id].bitmap         = bitmap;
    }
 }
 
@@ -506,6 +569,102 @@ void Screen::AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint1
 //----------------------------------------------
 void Screen::DrawBitmap(uint8_t id)
 {
-   hdw->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed); 
-   hdw->tft.drawBitmap(uiObjects[id].x, uiObjects[id].y, uiObjects[id].bitmap, uiObjects[id].width, uiObjects[id].height, COLOR_SCR_TEXT);
+   display->tft.fillRect(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, COLOR_SCR_BACKGROUND); 
+   display->tft.drawBitmap(uiObjects[id].x, uiObjects[id].y, uiObjects[id].bitmap, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed);
+}
+
+//----------------------------------------------
+// Add a line to the screen
+//----------------------------------------------
+void Screen::AddLine(uint8_t id, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)
+{
+  if (!uiObjects[id].initialized)
+   {
+      uiObjects[id].initialized    = true;
+      uiObjects[id].type           = UI_OBJTYPE_LINE;
+      uiObjects[id].x              = x0;
+      uiObjects[id].y              = y0;
+      uiObjects[id].width          = x1;
+      uiObjects[id].height         = y1;
+      uiObjects[id].colorUnpressed = color;
+   }
+}
+
+//----------------------------------------------
+// Draw a line
+//----------------------------------------------
+void Screen::DrawLine(uint8_t id)
+{
+  display->tft.drawLine(uiObjects[id].x, uiObjects[id].y, uiObjects[id].width, uiObjects[id].height, uiObjects[id].colorUnpressed);
+}
+
+//----------------------------------------------
+// Paint a blank screen with caption
+//----------------------------------------------
+void Screen::DrawBaseScreen(const char* caption, bool resetNotifyBar)
+{
+  if (resetNotifyBar)
+    display->tft.fillRect(0, 0, display->tft.width(), 20, COLOR_NAVBAR_BACKGROUND);
+
+  display->tft.fillRect(0, 21, display->tft.width(), 50, COLOR_SCR_CAPTION_BACKGROUND);         // screen caption
+  display->tft.fillRect(0, 72, display->tft.width(), display->tft.height() - 72, COLOR_SCR_BACKGROUND);  // screen area
+
+  //display->tft.drawBitmap(220, 2, BMP_XPN_OFF, 18, 18, COLOR_NAVBAR_DISABLED);
+  display->tft.drawBitmap(10, 35, BMP_MENU, 24, 24, COLOR_SCR_TEXT);
+   
+  display->tft.setTextColor(COLOR_SCR_TEXT);
+  display->tft.setTextSize(2);                 
+  display->tft.setCursor(40, 40);
+  display->tft.print(caption);
+
+  // Set default cursor position and text size at begining to the scr
+  display->tft.setTextSize(1);      
+  display->tft.setCursor(1, 85);
+}
+
+//----------------------------------------------
+// Draw/update a notification icon
+// Icons fixed sixe: 18x18px
+//----------------------------------------------
+void Screen::DrawNotifyIcon(uint8_t index, uint16_t color, const unsigned char *bitmap)
+{
+  // Remove previous icon
+  display->tft.fillRect(display->tft.width() - ((index + 1) * 20), 0, 20, 20, COLOR_NAVBAR_BACKGROUND);
+
+  // Draw/update the icon
+  display->tft.drawBitmap(display->tft.width() - ((index + 1) * 20), 0, bitmap, 18, 18, color);
+}
+
+//----------------------------------------------
+// Draw/update a notification icon
+// Icons fixed sixe: 18x18px
+//----------------------------------------------
+void Screen::PrintNotifyText(const char *text, uint16_t color)
+{
+  // Remove previous text
+  display->tft.fillRect(0, 0, display->tft.width() / 2, 20, COLOR_NAVBAR_BACKGROUND);
+
+  // Print the text
+  display->tft.setTextSize(1);
+  display->tft.setTextColor(color);
+  display->tft.setCursor(4, 8);
+  display->tft.print(text);
+}
+
+//----------------------------------------------
+// Print a text line in the screen
+//----------------------------------------------
+void Screen::PrintTextLine(const char *text)
+{
+  display->tft.setTextColor(COLOR_SCR_TEXT);
+  display->tft.println(text);
+}
+
+//----------------------------------------------
+// Print an error text line in the screen
+//----------------------------------------------
+void Screen::PrintErrTextLine(const char *text)
+{
+   display->tft.setTextColor(COLOR_SCR_ERROR_TEXT);
+   display->tft.println(text);
 }

@@ -1,6 +1,6 @@
-#include "EncoderSwitch.h"
+#include "EncoderMenuSwitch.h"
 
-EncoderSwitch encoder;
+EncoderMenuSwitch encoder;
 
 void setup()
 {
@@ -14,9 +14,9 @@ void loop()
   encoder.Dispatch();
 }
 
-void OnEncoderValueChanged(uint16_t newValue)
+void OnEncoderMoved(EncoderMenuSwitch::EncoderDirection dir)
 {
-  Serial.println(newValue);
+  Serial.println(dir);
 }
 
 void OnEncoderClick()

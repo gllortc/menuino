@@ -10,6 +10,7 @@
 #define _DRIVESCREEN_H 
 
 #include <Arduino.h>
+#include <XpnManager.h>
 #include "Screen.h"
 
 #define SPEED_STEPS_14        0 // Speed steps
@@ -57,32 +58,13 @@
 // Struct storing engine info
 //----------------------------------------------
 
-// Engine functions
-union Functions {
-  uint8_t Xpress[4];  // array para funciones, F0F4, F5F12, F13F20 y F21F28
-  unsigned long Bits; // long para acceder a los bits
-};
-
-// Current engine data
-typedef struct 
-{
-  boolean   loaded  = false;
-  uint16_t  address = 3;
-  uint8_t   steps   = 128;
-  uint8_t   speed   = 0;
-  uint8_t   direction;
-  Functions func;
-} Engine;
-
 //----------------------------------------------
 // Class declaration
 //----------------------------------------------
 class DriveScreen : public Screen
 {
-  bool            controlEnabled  = false;  // Indicate if an engine is controlled
-  //uint8_t         xpnDeviceID     = 25;     // Store the XPN device ID
-  
-  Engine          engine;
+  bool        controlEnabled  = false;  // Indicate if an engine is controlled
+  XpnManager* xpn;
 
 public:
 
@@ -94,24 +76,14 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager *hardware);
+  void InitializeUI() override;
   void Shown(ScreenParams *params) override;
   ScreenParams* ClickHandler(uint8_t objId) override;
   void EncoderClickHandler() override;
   void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir) override;
 
-  // XPN methods
-  uint8_t GetCV17AdrHighByte(uint16_t address);
-  uint8_t GetCV18AdrLowByte(uint16_t address);
-  uint8_t GetSpeedMax(uint8_t steps);
-  void GetEngineInfo();
-  void GetEngineFuncs();
-  void SetEngineSpeed(uint8_t speed);
-  void SetEngineDirection(uint8_t direction);
-  void ToggleEngineFunction(uint8_t funcNum);
-
   // Hardware handlers
-  void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3) override;
+  void HandleEngineNotify(XpnEngine *engine) override;
   
 };
 

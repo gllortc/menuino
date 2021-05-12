@@ -36,7 +36,7 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  void Initialize(HwdManager *hardware);
+  void InitializeUI() override;
   ScreenParams* ClickHandler(uint8_t objId) override;
 
 };

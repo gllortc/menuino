@@ -10,7 +10,9 @@
 #define _SCREEN_H 
 
 #include <Arduino.h>
-#include "HwdManager.h" 
+#include <OpenSmart32.h>
+#include <EncoderMenuSwitch.h>
+#include <XpnManager.h>
 #include "ScreenObjects.h" 
 
 #define UI_MAX_OBJECTS          20
@@ -18,9 +20,11 @@
 #define UI_OBJTYPE_CHECK_BUTTON 1
 #define UI_OBJTYPE_PUSH_BUTTON  2
 #define UI_OBJTYPE_MENU_BUTTON  3
-#define UI_OBJTYPE_TEXTBOX      4
-#define UI_OBJTYPE_PROGRESSBAR  5
-#define UI_OBJTYPE_BITMAP       6
+#define UI_OBJTYPE_TEXT_LABEL   4
+#define UI_OBJTYPE_TEXTBOX      5
+#define UI_OBJTYPE_PROGRESSBAR  6
+#define UI_OBJTYPE_BITMAP       7
+#define UI_OBJTYPE_LINE         8
 
 //----------------------------------------------
 // Struct storing UI object
@@ -45,6 +49,20 @@ typedef struct
   uint16_t              value          = 0;
 } UIObject;
 
+//----------------------------------------------
+// Screen calling parameters
+//----------------------------------------------
+typedef struct 
+{
+  uint8_t  gotoScr   = UI_OBJECT_NULL; // MANDATORY
+  uint8_t  inputMode = 0;
+  uint8_t  trackNum  = 0;              // app defined
+  uint16_t address   = 0;              // app defined
+} ScreenParams;
+
+//----------------------------------------------
+// Screen class
+//----------------------------------------------
 class Screen
 {
   ScreenParams    params;
@@ -52,13 +70,9 @@ class Screen
 
 public:
 
-  HwdManager*     hdw;
+  OpenSmart32*    display;
   uint8_t         id;         // Screen ID
   const char*     caption;    // Screen caption
-
-  // Screen parameters
-  uint8_t         scrParamTrack   = 0;
-  uint16_t        scrParamAddress = 0;
 
   //----------------------------------------------
   // Constructors
@@ -68,14 +82,14 @@ public:
   //----------------------------------------------
   // Methods
   //----------------------------------------------
-  virtual void Initialize(HwdManager* hardware, uint8_t scrId, const char* scrCaption);
-  virtual void Dispatch();
+  void Initialize(OpenSmart32* tft);
+  virtual void InitializeUI();
 
   // Hardware handlers
   virtual ScreenParams* ClickHandler(uint8_t objId);
   virtual void EncoderClickHandler();
   virtual void EncoderMovementHandler(EncoderMenuSwitch::EncoderDirection dir);
-  virtual void HandleEngineNotify(uint8_t adrHigh, uint8_t adrLow, uint8_t steps, uint8_t speed, uint8_t dir, uint8_t F0, uint8_t F1, uint8_t F2, uint8_t F3);
+  virtual void HandleEngineNotify(XpnEngine *engine);
 
   // Screen managers
   virtual void Show(ScreenParams *params);
@@ -100,6 +114,11 @@ public:
   void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption);
   void AddMenuButton(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colNorm, uint16_t colPress, const char* caption, uint16_t bmpWidth, uint16_t bmpHeight, const unsigned char *bitmap);
   void DrawMenuButton(uint8_t id);
+
+  void AddLabel(uint8_t id, uint16_t x, uint16_t y, uint8_t size, uint16_t color, const char* text);
+  void DrawLabel(uint8_t id);
+  void SetLabelTextValue(uint8_t id, const char* text);
+  void SetLabelIntValue(uint8_t id, uint16_t value);
   
   void AddTextBox(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t colBackground, uint16_t colBorder, const char* text);
   void DrawTextBox(uint8_t id);
@@ -109,8 +128,17 @@ public:
   void DrawProgressBar(uint8_t id);
   void SetProgressBarValue(uint8_t id, uint16_t value);
 
-  void AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color, const char* fileName);
+  void AddBitmap(uint8_t id, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color, const unsigned char *bitmap);
   void DrawBitmap(uint8_t id);
+
+  void AddLine(uint8_t id, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+  void DrawLine(uint8_t id);
+
+  void DrawBaseScreen(const char* caption, bool resetNotifyBar = true);
+  void DrawNotifyIcon(uint8_t index, uint16_t color, const unsigned char *bitmap);
+  void PrintNotifyText(const char *text, uint16_t color = COLOR_SCR_TEXT);
+  void PrintTextLine(const char *text);
+  void PrintErrTextLine(const char *text);
 
   // Settings management
   static uint16_t GetTrackAddress(uint8_t trackNum);

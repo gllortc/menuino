@@ -11,9 +11,8 @@ InputScreen::InputScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void InputScreen::Initialize(HwdManager* hardware)
+void InputScreen::InitializeUI()
 {
-  hdw     = hardware;
   id      = SCR_ADDRESS_ID;
   caption = LNG_EN_INPUT_HEADER;
 
@@ -83,7 +82,7 @@ void InputScreen::Shown(ScreenParams *params)
       break;
   }
 
-  hdw->tft.setTextSize(2);
+  display->tft.setTextSize(2);
 }
 
 //----------------------------------------------
@@ -162,22 +161,15 @@ void InputScreen::DeleteButtonPressed(uint8_t objId)
 //----------------------------------------------
 ScreenParams* InputScreen::OkButtonPressed(uint8_t objId)
 {
-  uint16_t inputValue = GetInputValue();
-
-  ToggleButtonState(objId);
-  
   switch (mode)
   {
     case INPUT_MODE_MANUAL_ADDR:
-      return GotoScreen(SCR_DRIVE_ID, inputValue);
+      return GotoScreen(SCR_DRIVE_ID, GetInputValue());
 
     case INPUT_MODE_TRACK_ADDR:
-      hdw->SetTrackAddress(track, inputValue);
-      return GotoScreen(SCR_SETUP_ID, inputValue);
+      return GotoScreen(SCR_SETUP_ID, GetInputValue(), track);
 
     case INPUT_MODE_DEVID:
-      hdw->SetDeviceID(lowByte(inputValue));
-      hdw->xpnMaster.devId = lowByte(inputValue);
       return GotoScreen(SCR_SETUP_ID, id);
 
     default:

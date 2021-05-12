@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EncoderMenuSwitch.h>
 #include "MenuScreen.h"
 #include "InputScreen.h"
 #include "ScreenObjects.h"
@@ -11,9 +12,8 @@ MenuScreen::MenuScreen() {}
 //----------------------------------------------
 // Initialize the instance
 //----------------------------------------------
-void MenuScreen::Initialize(HwdManager* hardware)
+void MenuScreen::InitializeUI()
 {
-  hdw     = hardware;
   id      = SCR_MENU_ID;
   caption = LNG_EN_MENU_HEADER;
 
@@ -21,6 +21,11 @@ void MenuScreen::Initialize(HwdManager* hardware)
   AddMenuButton(UI_MENU_MANUAL, 5, 125, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_MENU_OPT_DRIVE);
   AddMenuButton(UI_MENU_SETUP,  5, 170, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_MENU_OPT_SETUP);
   AddMenuButton(UI_MENU_INFO,   5, 215, 230, 40, COLOR_BTN_NORMAL, COLOR_BTN_PRESSED, LNG_EN_MENU_OPT_INFO);
+
+  if (CURRENT_TERMINAL == TERMINAL_RIGHT)
+    AddBitmap(UI_MENU_IMG_LOGO, display->tft.width() - 80, display->tft.height() - 60, 60, 40, 0xFF10, BMP_APP_LOGO_RIGHT);
+  else
+    AddBitmap(UI_MENU_IMG_LOGO, 20, display->tft.height() - 60, 60, 40, 0xFF10, BMP_APP_LOGO_LEFT);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -61,7 +66,7 @@ void MenuScreen::EncoderClickHandler()
   if (selIdx >= 0)
   {
     UIObject* obj = GetUIObject(selIdx);
-    if (OnClick) OnClick(obj->x + 1, obj->y + 1);
+    if (OnDisplayClick) OnDisplayClick(obj->x + 1, obj->y + 1);
   }
 }
 
